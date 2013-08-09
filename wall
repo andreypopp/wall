@@ -1,0 +1,3 @@
+#!/usr/bin/env coffee
+makeApp = require('./index')
+app = makeApp().listen(3004)
