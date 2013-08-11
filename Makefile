@@ -7,6 +7,7 @@ REPONAME = $(shell echo $(REPO) | sed -E 's_.+:([a-zA-Z0-9_\-]+)/([a-zA-Z0-9_\-]
 develop:
 	@$(BIN)/supervisor -q \
 		-i node_modules/ \
+		-i ui/ \
 		-e 'coffee|js' \
 		-x $(BIN)/coffee \
 		-- wall

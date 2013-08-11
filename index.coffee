@@ -8,6 +8,9 @@
 ###
 
 path        = require 'path'
+sqlite      = require 'sqlite3'
+kew         = require 'kew'
+uuid        = require 'node-uuid'
 express     = require 'express'
 page        = require 'connect-page'
 stylus      = require 'connect-stylus'
@@ -15,18 +18,85 @@ browserify  = require 'connect-browserify'
 
 rel = path.join.bind(null, __dirname)
 
-assets = ->
+promise = (func) ->
+  (req, res, next) ->
+    func(req, res, next)
+      .then (result) -> 
+        if result == undefined then res.send 404 else res.send result
+      .fail(next)
+      .end()
+
+promisify = (func) ->
+  (args...) ->
+    result = kew.defer()
+    args.push (err, res) ->
+      if err then result.reject(err) else result.resolve(res)
+    func.call(this, args...)
+    result
+
+asParams = (o) ->
+  result = {}
+  for k, v of o
+    result["$#{k}"] = v.toString()
+  result
+
+sqlite.Database::promiseRun = promisify sqlite.Database::run
+sqlite.Database::promiseAll = promisify sqlite.Database::all
+sqlite.Database::promiseGet = promisify sqlite.Database::get
+
+assets = (options = {}) ->
   app = express()
-  app.get '/index.css', stylus
+  app.get '/css/index.css', stylus
     entry: rel 'ui/index.styl'
     use: ['normalize', 'nib']
     includeCSS: true
-  app.get '/index.js', browserify
+  app.get '/js/index.js', browserify
     entry: rel 'ui/index.coffee'
     extensions: ['.coffee']
     transforms: ['coffeeify', 'reactify']
     debug: true
   app.use '/font', express.static rel('node_modules/font-awesome/font')
+  app
+
+api = (options = {}) ->
+  db = new sqlite.Database(options.database or ':memory:')
+
+  db.run """
+    create table if not exists items (
+      id text,
+      title text,
+      uri text,
+      description text,
+      created text,
+      creator text,
+      primary key (id)
+    );
+    """
+
+  app = express()
+
+  app.get '/items', promise (req, res) ->
+    db.promiseAll("select * from items order by created desc")
+      .then (items) -> {items}
+
+  app.post '/items', promise (req, res) ->
+    data = req.body
+    data.id = uuid.v4()
+    data.created = new Date
+    data.creator = 'user'
+    db.promiseRun("""
+      insert into items (id, title, uri, description, created, creator)
+      values ($id, $title, $uri, $description, $created, $creator)
+      """, asParams(data))
+        .then -> data
+
+  app.get '/items/:id', promise (req, res) ->
+    db.promiseGet("select * from items where id = $id", req.params.id)
+
+  app.get '/users/:username', (req, res) ->
+    res.send
+      username: req.params.username
+
   app
 
 module.exports = (options = {}) ->
@@ -36,10 +106,11 @@ module.exports = (options = {}) ->
   app.use express.bodyParser()
   app.use express.cookieParser()
   app.use express.cookieSession(secret: 'x')
-  app.get '/', page
+  app.use '/api', api(options)
+  app.use '/a', assets(options)
+  app.use page
     title: 'Wall'
-    scripts: ['/a/index.js']
-    stylesheets: ['/a/index.css']
-  app.use '/a', assets()
+    scripts: ['/a/js/index.js']
+    stylesheets: ['/a/css/index.css']
   app.use express.errorHandler()
   app

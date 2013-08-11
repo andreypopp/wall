@@ -1,5 +1,228 @@
+@import url('http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,300')
 @import normalize
 @import nib
 @import "../node_modules/font-awesome/css/font-awesome.css"
 
+
+font-family = 'Source Sans Pro', sans-serif
+font-size = 14px
+font-size-large = ceil(font-size * 1.25)
+font-size-small = ceil(font-size * 0.85)
+
+line-height = 1.428571429
+line-height-computed = floor(font-size * line-height)
+
+color-mute = #ddd
+color-text = #444
+color-link = #aeaeae
+color-link-hover = color-text
+color-headings-small = color-text
+color-bg = #fafafa
+color-bg-input = color-bg
+color-bg-highlight = lighten(color-bg, 70%)
+color-border-input = color-mute
+
+headings-font-family = font-family
+headings-font-weight = bold
+headings-line-height = 1.1
+
+padding-vertical = 8px
+padding-horizontal = 12px
+padding-large-vertical = 14px
+padding-large-horizontal = 16px
+padding-small-vertical = 5px
+padding-small-horizontal = 10px
+
+input-color-placeholder = #888
+input-height = line-height-computed + (padding-vertical * 2) + 2
+input-height-large = (ceil(font-size-large * line-height) + (padding-large-vertical * 2) + 2)
+input-height-small = (ceil(font-size-small * line-height) + (padding-small-vertical * 2) + 2)
+
+app-width = 600px
+
 global-normalize()
+
+*
+  box-sizing: border-box
+
+html
+  font-size: 62.5%
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
+
+body
+  font-family: font-family
+  font-size: font-size
+  line-height: line-height
+  background-color: color-bg
+  color: color-text
+
+input,
+button,
+select,
+textarea
+  font-family: inherit
+  font-size: inherit
+  line-height: inherit
+
+img
+  vertical-align: middle
+
+a
+  color: color-link
+  text-decoration: none
+  &:hover, &:focus
+    color: color-link-hover
+    text-decoration: underline
+
+p
+  margin: 0 0 (line-height-computed / 2)
+
+small
+  font-size: 85%
+
+cite
+  font-style: normal
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6
+  font-family: headings-font-family
+  font-weight: headings-font-weight
+  line-height: headings-line-height
+  color: color-text
+  small
+    font-weight: normal
+    line-height: 1
+    color: color-headings-small
+  a
+    color: color-text
+    &:hover
+      text-decoration: none
+
+h1, h2, h3
+  margin-top: line-height-computed
+  margin-bottom: (line-height-computed / 2)
+
+h4, h5, h6
+  margin-top: line-height-computed / 2
+  margin-bottom: line-height-computed / 2
+
+h1, .h1
+  font-size: ceil(font-size * 2.70)
+h2, .h2
+  font-size: ceil(font-size * 2.25)
+h3, .h3
+  font-size: ceil(font-size * 1.70)
+h4, .h4
+  font-size: ceil(font-size * 1.25)
+h5, .h5
+  font-size:  font-size
+h6, .h6
+  font-size: ceil(font-size * 0.85)
+
+h1 small, .h1 small
+  font-size: ceil(font-size * 1.70)
+h2 small, .h2 small
+  font-size: ceil(font-size * 1.25)
+h3 small, .h3 small, h4 small, .h4 small
+  font-size: font-size
+
+input, textarea
+  display: block
+  width: 100%
+  height: input-height
+  padding: padding-small-vertical padding-small-horizontal
+  font-size: font-size
+  line-height: line-height
+  color: gray
+  vertical-align: middle
+  background-color: color-bg-input
+  border: none
+  border-bottom: 1px solid color-border-input
+
+  &:focus, &:active
+    outline: none
+    background-color: color-bg-highlight
+
+textarea
+  height: auto
+  resize: vertical
+
+.Controls
+  text-align: center
+
+.Control
+  display: inline-block
+  cursor: pointer
+  font-weight: bold
+  padding: padding-vertical padding-horizontal
+  background: color-bg
+  user-select: none
+  &:hover
+    background: color-bg-highlight
+    text-decoration: none
+  .label
+    margin-left: padding-small-horizontal
+
+.App
+  width: app-width
+  margin: 0 auto
+  header
+    position: relative
+    .Controls
+      position: absolute
+      right: 0
+      bottom: 0
+
+.WriteScreen
+  textarea
+    height: 7em
+
+.ItemView
+  icon-size = 20px
+  padding: padding-vertical padding-horizontal
+  padding-left: padding-horizontal * 2.5 + icon-size
+  position: relative
+
+  &:hover
+    background: color-bg-highlight
+  .title
+    margin: 0
+  .icon
+    font-size: icon-size
+    width: icon-size
+    height: icon-size
+    color: color-mute
+    position: absolute
+    display: block
+    margin: auto
+    left: padding-horizontal * 1.5
+    top: 0
+    bottom: 0
+  .uri
+    display: inline-block
+    color: color-mute
+    font-size: font-size-small
+  .created
+    position: absolute
+    display: block
+    margin: auto
+    font-size: font-size-small
+    top: 0
+    bottom: 0
+    height: line-height-computed
+    right: padding-horizontal
+    color: color-mute
+
+.CommentEditor
+  icon-size = 20px
+  position: relative
+  padding: padding-vertical padding-horizontal
+  padding-left: padding-horizontal * 2 + icon-size
+  .icon-comment
+    position: absolute
+    color: color-mute
+    left: padding-horizontal * 1.5
+    font-size: icon-size
+    height: icon-size
+    width: icon-size
+    top: padding-vertical * 1.5
