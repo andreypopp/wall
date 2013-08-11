@@ -233,9 +233,9 @@ Modal = React.createClass
 LoginDialog = React.createClass
   render: ->
     `<div class="LoginDialog">
-      <div class="Controls">
-        <Control label="Sign in with Facebook" icon="facebook" />
-        <Control label="Sign in with Twitter" icon="twitter" />
+      <div onClick={Wall.hideModal} class="Controls">
+        <Control href="/auth/facebook" label="Sign in with Facebook" icon="facebook" />
+        <Control href="/auth/twitter" label="Sign in with Twitter" icon="twitter" />
       </div>
      </div>`
 
@@ -246,9 +246,10 @@ App = React.createClass
     title: React.PropTypes.string.isRequired
 
   routes:
-    '':           'items'
-    'items/:id':  'item'
-    '~:username': 'user'
+    '':               'items'
+    'items/:id':      'item'
+    '~:username':     'user'
+    'auth/:provider': 'auth'
 
   events:
     'click a': (e) ->
@@ -271,6 +272,9 @@ App = React.createClass
     this.listenTo this.router, 'route:item', (id) =>
       model = new Item {id}
       model.fetch().then => this.show new ItemScreen {model}
+    this.listenTo this.router, 'route:auth', (provider) =>
+      window.open(window.location.pathname)
+      Backbone.history.history.back()
 
   show: (screen, options = {}) ->
     this.setState {screen}
@@ -278,22 +282,17 @@ App = React.createClass
     this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
 
   renderControls: ->
-    authControl = if this.state?.user?
-      Control(
-        class: 'logout', icon: 'signout',
-        href: '/auth/logout', label: 'Sign out')
-    else
-      Control(
-        class: 'login', icon: 'signin', label: 'Sign in',
-        onClick: => this.showModal LoginDialog())
-
-    controls = [
-      Control(
+    controls = if this.state?.user?
+      [Control(
         class: 'submit', icon: 'pencil', label: 'Submit',
         onClick: => this.showModal WriteScreen()),
-      authControl,
-    ]
-
+       Control(
+        class: 'logout', icon: 'signout',
+        href: '/auth/logout', label: 'Sign out')]
+    else
+      [Control(
+        class: 'login', icon: 'signin', label: 'Sign in',
+        onClick: => this.showModal LoginDialog())]
     `<div class="Controls">{controls}</div>`
 
   render: ->
