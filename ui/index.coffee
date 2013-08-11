@@ -15,6 +15,7 @@ Record                        = require 'backbone.record'
 Backbone.$                    = require 'jqueryify'
 React                         = require 'react-tools/build/modules/react'
 Timestamp                     = require 'react-time'
+DOMEvents                     = require 'react-dom-events'
 _BootstrapModal               = require './bootstrap-modal'
 
 AppEvents = extend {}, Backbone.Events,
@@ -40,40 +41,6 @@ HasModal =
 
   hideModal: ->
     this.refs.modal.hide()
-
-delegateEventSplitter = /^(\S+)\s*(.*)$/
-
-DOMEvents =
-
-  delegateDOMEvents: (events = result(this, 'events')) ->
-    return unless events
-    this.undelegateDOMEvents()
-    for key, method of events
-
-      unless isFunction method
-        method = this[method]
-      else
-        method = method.bind(this)
-
-      continue unless method
-
-      [_, eventName, selector] = key.match(delegateEventSplitter)
-      eventName += '.delegateEvents'
-      $el = Backbone.$ this.getDOMNode()
-      if selector == ''
-        $el.on(eventName, method)
-      else
-        $el.on(eventName, selector, method)
-
-  undelegateDOMEvents: ->
-    $el = Backbone.$ this.getDOMNode()
-    $el.off('.delegateEvents')
-
-  componentDidMount: ->
-    this.delegateDOMEvents()
-
-  componentWillUnmount: ->
-    this.undelegateDOMEvents()
 
 Screen =
   url: -> result this.props.model, 'screenURL'
@@ -307,6 +274,6 @@ App = React.createClass
      </div>`
 
 window.onload = ->
-  Wall = window.Wall = App(title: 'Wall')
+  Wall = window.Wall = App(title: "wall")
   React.renderComponent Wall, document.body
   Backbone.history.start(pushState: true)
