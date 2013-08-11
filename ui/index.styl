@@ -1,9 +1,3 @@
-@import url('http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,300')
-@import normalize
-@import nib
-@import "../node_modules/font-awesome/css/font-awesome.css"
-
-
 font-family = 'Source Sans Pro', sans-serif
 font-size = 14px
 font-size-large = ceil(font-size * 1.25)
@@ -20,6 +14,7 @@ color-headings-small = color-text
 color-bg = #fafafa
 color-bg-input = color-bg
 color-bg-highlight = lighten(color-bg, 70%)
+color-bg-modal-backdrop = darken(color-bg, 3%)
 color-border-input = color-mute
 
 headings-font-family = font-family
@@ -39,6 +34,12 @@ input-height-large = (ceil(font-size-large * line-height) + (padding-large-verti
 input-height-small = (ceil(font-size-small * line-height) + (padding-small-vertical * 2) + 2)
 
 app-width = 600px
+
+@import url('http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,300')
+@import normalize
+@import nib
+@import "../node_modules/font-awesome/css/font-awesome.css"
+@import "./modal"
 
 global-normalize()
 
@@ -168,6 +169,7 @@ textarea
   margin: 0 auto
   header
     position: relative
+    margin-bottom: padding-vertical * 5
     .Controls
       position: absolute
       right: 0
@@ -176,6 +178,14 @@ textarea
 .WriteScreen
   textarea
     height: 7em
+
+.ItemScreen
+  .ItemView
+    margin-bottom: padding-vertical * 3
+
+.WriteScreen
+  .form
+    margin-bottom: padding-vertical * 3
 
 .ItemView
   icon-size = 20px
@@ -226,3 +236,16 @@ textarea
     height: icon-size
     width: icon-size
     top: padding-vertical * 1.5
+
+.LoginDialog
+  width: 400px
+  height: 200px
+  margin: auto
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  position: absolute
+  background-color: color-bg
+  box-shadow: 0px 0px 15px color-mute
+  border-radius: 1px

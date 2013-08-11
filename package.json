@@ -34,7 +34,10 @@
     "node-uuid": "~1.4.0",
     "express-configure": "0.0.3",
     "kew": "~0.1.7",
-    "commander": "~2.0.0"
+    "commander": "~2.0.0",
+    "passport": "~0.1.17",
+    "passport-facebook": "~0.1.5",
+    "passport-twitter": "~0.1.5"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3",

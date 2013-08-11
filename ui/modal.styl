@@ -1,0 +1,58 @@
+zindex-modal = 10000
+
+.modal-open
+  overflow: hidden
+
+.modal
+  display: none
+  overflow: auto
+  overflow-y: scroll
+  position: fixed
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+  z-index: zindex-modal
+
+
+  &.fade .modal-dialog
+    transform: scale(0.9)
+    opacity: 0
+    transition-property: transform, opacity
+    transition-duration: 0.25s
+    transition-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000)
+
+  &.fade.in  .modal-dialog
+    opacity: 1
+    transform: scale(1)
+
+.modal-dialog
+  margin-left: auto
+  margin-right: auto
+  width: auto
+  height: 100%
+  z-index: (zindex-modal + 10)
+
+.modal-body
+  position: relative
+  height: 100%
+
+.modal-backdrop
+  position: fixed
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+  z-index: (zindex-modal - 10)
+  user-select: none
+
+  &.fade
+    opacity: 0
+    background-color: color-bg
+    transition-property: opacity, background-color
+    transition-duration: 0.25s
+    transition-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000)
+
+  &.fade.in
+    opacity: 0.9
+    background-color: color-bg-modal-backdrop

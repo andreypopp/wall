@@ -15,6 +15,7 @@ Record                        = require 'backbone.record'
 Backbone.$                    = require 'jqueryify'
 React                         = require 'react-tools/build/modules/react'
 Timestamp                     = require 'react-time'
+_BootstrapModal               = require './bootstrap-modal'
 
 AppEvents = extend {}, Backbone.Events,
   componentWillUnmount: ->
@@ -156,15 +157,18 @@ WriteScreen = React.createClass
       Wall.show(new ItemScreen(model: this.props.model), trigger: true)
 
   onCancel: ->
+    Backbone.history.history.back()
 
   render: ->
     item = this.props.model
     `<div class="WriteScreen">
-      <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
-      <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
-      <textarea class="description" ref="description" placeholder="Description">
-        {item.description}
-      </textarea>
+      <div class="form">
+        <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
+        <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
+        <textarea class="description" ref="description" placeholder="Description">
+          {item.description}
+        </textarea>
+      </div>
       <div class="Controls">
         <Control onClick={this.onSubmit} icon="ok" label="Submit" />
         <Control onClick={this.onCancel} icon="remove" label="Cancel" />
@@ -173,7 +177,44 @@ WriteScreen = React.createClass
 
 UserView = React.createClass
   render: ->
-    `<div class="User">
+    `<div class="User"></div>`
+
+Modal = React.createClass
+  $getDOMNode: ->
+    $ this.getDOMNode()
+
+  componentDidMount: ->
+    $node = this.$getDOMNode()
+    $node.modal(backdrop: 'static', show: not this.props.hide)
+    $node.on 'shown.bs.modal',  this.props.onShow if this.props.onShow?
+    $node.on 'hidden.bs.modal', this.props.onHide if this.props.onHide?
+
+  componentWillUnmount: ->
+    this.hide()
+
+  hide: ->
+    this.$getDOMNode().modal 'hide'
+
+  show: ->
+    this.$getDOMNode().modal 'show'
+
+  onBodyClick: (e) ->
+    e.stopPropagation() unless e.target == this.refs.modalBody.getDOMNode()
+
+  render: ->
+    `<div onClick={this.props.onClick} class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-body" ref="modalBody" onClick={this.onBodyClick}>
+          {this.props.children}
+        </div>
+      </div>
+     </div>`
+
+LoginDialog = React.createClass
+  render: ->
+    `<div class="LoginDialog Controls">
+      <Control label="Sign in with Facebook" icon="facebook" />
+      <Control label="Sign in with Twitter" icon="twitter" />
      </div>`
 
 App = React.createClass
@@ -195,6 +236,13 @@ App = React.createClass
         e.preventDefault()
         this.router.navigate href, trigger: true
 
+  getInitialState: ->
+    user = try
+      JSON.parse window.localStorage.getItem('wall.user')
+    catch e
+      null
+    {user}
+
   componentDidMount: ->
     this.listenTo this.router, 'route:items', =>
       model = new Items()
@@ -211,16 +259,49 @@ App = React.createClass
     screenURL = screen.url()
     this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
 
+  showModal: (screen) ->
+    this.setState(modal: screen)
+
+  hideModal: ->
+    this.refs.modal.hide()
+
+  onModalHide: ->
+    this.setState(modal: undefined)
+
+  renderControls: ->
+    authControl = if this.state?.user?
+      Control(
+        class: 'logout', icon: 'signout',
+        href: '/auth/logout', label: 'Sign out')
+    else
+      Control(
+        class: 'login', icon: 'signin', label: 'Sign in',
+        onClick: => this.showModal LoginDialog())
+
+    controls = [
+      Control(
+        class: 'submit', icon: 'pencil',
+        href: '/write', label: 'Submit'),
+      authControl,
+    ]
+
+    `<div class="Controls">{controls}</div>`
+
+  renderModal: ->
+    if this.state?.modal
+      `<Modal ref="modal"
+        onHide={this.onModalHide}
+        onClick={this.hideModal}>{this.state.modal}</Modal>` 
+
   render: ->
     screen = this.state?.screen
     `<div class="App">
       <header>
         <h1><a href="/">{this.props.title}</a></h1>
-        <div class="Controls">
-          <Control class="submit" icon="pencil" href="/write" label="Submit" />
-        </div>
+        {this.renderControls()}
       </header>
       <div class="screen">{screen}</div>
+      {this.renderModal()}
      </div>`
 
 window.onload = ->

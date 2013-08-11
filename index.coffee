@@ -15,6 +15,7 @@ express     = require 'express'
 page        = require 'connect-page'
 stylus      = require 'connect-stylus'
 browserify  = require 'connect-browserify'
+passport    = require 'passport'
 
 rel = path.join.bind(null, __dirname)
 
@@ -99,13 +100,61 @@ api = (options = {}) ->
 
   app
 
+auth = (options = {}) ->
+
+  storeIdentity = (accessToken, refreshToken, profile, cb) ->
+    console.log profile
+    cb(null, profile)
+
+  authenticate = (req, res, next) ->
+    provider = passport.authenticate req.params.provider
+    provider(req, res, next)
+
+  setUser = (user) ->
+    window.localStorage.setItem('wall.user', JSON.stringify(user))
+
+  callInBrowser = (func, args...) ->
+    """
+    <!doctype html>
+    <script>
+    (#{func.toString()})(#{args.map(JSON.stringify).join(', ')});
+    window.close();
+    </script>
+    """
+
+  passport.serializeUser (user, done) ->
+    delete user._raw
+    delete user._json
+    done(null, user)
+
+  passport.deserializeUser (user, done) ->
+    done(null, user)
+
+  for provider, providerOptions of options
+    strategy = require("passport-#{provider}").Strategy
+    passport.use new strategy(providerOptions)
+
+  app = express()
+
+  app.get '/logout', (req, res) ->
+    req.logOut()
+    res.send callInBrowser setUser, null
+  app.get '/:provider', authenticate
+  app.get '/:provider/callback', authenticate, (req, res) ->
+    res.send callInBrowser setUser, req.user
+
+  app
+
 module.exports = (options = {}) ->
   app = express()
   app.use express.logger('dev')
   app.use express.favicon()
   app.use express.bodyParser()
   app.use express.cookieParser()
-  app.use express.cookieSession(secret: 'x')
+  app.use express.cookieSession(secret: options?.secret)
+  app.use passport.initialize()
+  app.use passport.session()
+  app.use '/auth', auth(options?.auth)
   app.use '/api', api(options)
   app.use '/a', assets(options)
   app.use page
