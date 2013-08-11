@@ -175,16 +175,27 @@ textarea
       right: 0
       bottom: 0
 
+.Modalized
+  background-color: color-bg
+  padding: padding-large-vertical padding-large-horizontal
+  margin: auto
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  box-shadow: 0px 0px 15px color-mute
+  border-radius: 1px
+
 .WriteScreen
+  @extend .Modalized
+  width: app-width - 50px
   textarea
     height: 7em
+  .form
+    margin-bottom: padding-vertical * 3
 
 .ItemScreen
   .ItemView
-    margin-bottom: padding-vertical * 3
-
-.WriteScreen
-  .form
     margin-bottom: padding-vertical * 3
 
 .ItemView
@@ -238,14 +249,6 @@ textarea
     top: padding-vertical * 1.5
 
 .LoginDialog
+  @extend .Modalized
   width: 400px
   height: 200px
-  margin: auto
-  top: 0
-  bottom: 0
-  left: 0
-  right: 0
-  position: absolute
-  background-color: color-bg
-  box-shadow: 0px 0px 15px color-mute
-  border-radius: 1px

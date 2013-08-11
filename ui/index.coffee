@@ -25,6 +25,22 @@ LocationAware =
   componentDidMount: ->
     this.router = new Backbone.Router(routes: this.routes)
 
+HasModal =
+  renderModal: ->
+    if this.state?.modal
+      `<Modal ref="modal"
+        onHide={this.onModalHide}
+        onClick={this.hideModal}>{this.state.modal}</Modal>` 
+
+  onModalHide: ->
+    this.setState(modal: undefined)
+
+  showModal: (screen) ->
+    this.setState(modal: screen)
+
+  hideModal: ->
+    this.refs.modal.hide()
+
 delegateEventSplitter = /^(\S+)\s*(.*)$/
 
 DOMEvents =
@@ -147,20 +163,24 @@ ItemScreen = React.createClass
 WriteScreen = React.createClass
   mixins: [Screen]
 
+  getInitialState: ->
+    {model: new Item}
+
   onSubmit: (e) ->
     e.preventDefault()
     data = 
       title: this.refs.title.getDOMNode().value
       uri: this.refs.uri.getDOMNode().value
       description: this.refs.description.getDOMNode().value
-    this.props.model.save(data).then =>
-      Wall.show(new ItemScreen(model: this.props.model), trigger: true)
+    this.state.model.save(data).then =>
+      Wall.show(new ItemScreen(model: this.state.model), trigger: true)
+      Wall.hideModal()
 
   onCancel: ->
-    Backbone.history.history.back()
+    Wall.hideModal()
 
   render: ->
-    item = this.props.model
+    item = this.state.model
     `<div class="WriteScreen">
       <div class="form">
         <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
@@ -212,13 +232,15 @@ Modal = React.createClass
 
 LoginDialog = React.createClass
   render: ->
-    `<div class="LoginDialog Controls">
-      <Control label="Sign in with Facebook" icon="facebook" />
-      <Control label="Sign in with Twitter" icon="twitter" />
+    `<div class="LoginDialog">
+      <div class="Controls">
+        <Control label="Sign in with Facebook" icon="facebook" />
+        <Control label="Sign in with Twitter" icon="twitter" />
+      </div>
      </div>`
 
 App = React.createClass
-  mixins: [AppEvents, DOMEvents, LocationAware]
+  mixins: [AppEvents, DOMEvents, LocationAware, HasModal]
 
   propTypes:
     title: React.PropTypes.string.isRequired
@@ -226,7 +248,6 @@ App = React.createClass
   routes:
     '':           'items'
     'items/:id':  'item'
-    'write':      'write'
     '~:username': 'user'
 
   events:
@@ -250,23 +271,11 @@ App = React.createClass
     this.listenTo this.router, 'route:item', (id) =>
       model = new Item {id}
       model.fetch().then => this.show new ItemScreen {model}
-    this.listenTo this.router, 'route:write', =>
-      model = new Item
-      this.show new WriteScreen {model}
 
   show: (screen, options = {}) ->
     this.setState {screen}
     screenURL = screen.url()
     this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
-
-  showModal: (screen) ->
-    this.setState(modal: screen)
-
-  hideModal: ->
-    this.refs.modal.hide()
-
-  onModalHide: ->
-    this.setState(modal: undefined)
 
   renderControls: ->
     authControl = if this.state?.user?
@@ -280,18 +289,12 @@ App = React.createClass
 
     controls = [
       Control(
-        class: 'submit', icon: 'pencil',
-        href: '/write', label: 'Submit'),
+        class: 'submit', icon: 'pencil', label: 'Submit',
+        onClick: => this.showModal WriteScreen()),
       authControl,
     ]
 
     `<div class="Controls">{controls}</div>`
-
-  renderModal: ->
-    if this.state?.modal
-      `<Modal ref="modal"
-        onHide={this.onModalHide}
-        onClick={this.hideModal}>{this.state.modal}</Modal>` 
 
   render: ->
     screen = this.state?.screen
