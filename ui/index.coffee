@@ -300,7 +300,7 @@ App = React.createClass
     screen = this.state?.screen
     `<div class="App">
       <header>
-        <h1><a href="/">{this.props.title}</a></h1>
+        <h1 class="title"><a href="/">{this.props.title}</a></h1>
         {this.renderControls()}
       </header>
       <div class="screen">{screen}</div>
