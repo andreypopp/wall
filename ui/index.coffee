@@ -16,6 +16,7 @@ Backbone.$                    = require 'jqueryify'
 React                         = require 'react-tools/build/modules/react'
 Timestamp                     = require 'react-time'
 DOMEvents                     = require 'react-dom-events'
+Textarea                      = require 'react-textarea-autosize'
 _BootstrapModal               = require './bootstrap-modal'
 
 AppEvents = extend {}, Backbone.Events,
@@ -127,7 +128,7 @@ CommentEditor = React.createClass
   render: ->
     `<div class="CommentEditor">
       <i class="icon icon-comment"></i>
-      <textarea ref="description" class="description" placeholder="Add comment"></textarea>
+      <Textarea autosize ref="description" class="description" placeholder="Add comment"></Textarea>
       <div class="Controls">
         <Control onClick={this.props.onSubmit} icon="ok" label="Submit" />
         <Control onClick={this.props.onCancel} icon="remove" label="Cancel" />
@@ -184,9 +185,9 @@ WriteScreen = React.createClass
       <div class="form">
         <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
         <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
-        <textarea class="description" ref="description" placeholder="Description">
+        <Textarea autosize class="description" ref="description" placeholder="Description">
           {item.description}
-        </textarea>
+        </Textarea>
       </div>
       <div class="Controls">
         <Control onClick={this.onSubmit} icon="ok" label="Submit" />

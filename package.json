@@ -38,7 +38,8 @@
     "passport": "~0.1.17",
     "passport-facebook": "~0.1.5",
     "passport-twitter": "~0.1.5",
-    "react-dom-events": "~0.1.0"
+    "react-dom-events": "~0.1.0",
+    "react-textarea-autosize": "~0.1.0"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3",
