@@ -215,11 +215,13 @@ Modal = React.createClass
 
 LoginDialog = React.createClass
   render: ->
+    buttons = for provider in Wall.settings.authProviders
+      Control(icon: provider, href: "/auth/#{provider}", label: "Sign in with #{provider}")
     `<div class="LoginDialog">
-      <div onClick={Wall.hideModal} class="Controls">
-        <Control href="/auth/facebook" label="Sign in with Facebook" icon="facebook" />
-        <Control href="/auth/twitter" label="Sign in with Twitter" icon="twitter" />
+      <div class="caption">
+        Sign in with one of the authentication providers below
       </div>
+      <div onClick={Wall.hideModal} class="Controls">{buttons}</div>
      </div>`
 
 App = React.createClass
@@ -291,5 +293,6 @@ App = React.createClass
 
 window.onload = ->
   Wall = window.Wall = App(title: "wall")
+  Wall.settings = __data
   React.renderComponent Wall, document.body
   Backbone.history.start(pushState: true)

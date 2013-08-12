@@ -103,7 +103,6 @@ api = (options = {}) ->
 auth = (options = {}) ->
 
   storeIdentity = (accessToken, refreshToken, profile, cb) ->
-    console.log profile
     cb(null, profile)
 
   authenticate = (req, res, next) ->
@@ -161,5 +160,7 @@ module.exports = (options = {}) ->
     title: 'Wall'
     scripts: ['/a/js/index.js']
     stylesheets: ['/a/css/index.css']
+    data:
+      authProviders: Object.keys(options.auth)
   app.use express.errorHandler()
   app
