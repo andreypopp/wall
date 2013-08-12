@@ -13,10 +13,13 @@ zindex-modal = 10000
   bottom: 0
   left: 0
   z-index: zindex-modal
+  perspective: 800px
 
 
   &.fade .modal-dialog
-    transform: translate(0, -25%)
+    transform-origin: top center
+    transform-style: preserve-3d
+    transform: translate(0, -10%) rotateX(-45deg)
     opacity: 0
     transition-property: transform, opacity
     transition-duration: 0.25s
@@ -24,7 +27,7 @@ zindex-modal = 10000
 
   &.fade.in  .modal-dialog
     opacity: 1
-    transform: translate(0, 0)
+    transform: translate(0, 0) rotateX(0deg)
 
 .modal-dialog
   margin-left: auto
