@@ -9,6 +9,7 @@
 
 ###
 
+url                           = require 'url'
 {extend, result, isFunction}  = require 'underscore'
 Backbone                      = require 'backbone'
 Record                        = require 'backbone.record'
@@ -109,7 +110,7 @@ ItemView = React.createClass
     `<div class="ItemView">
       <i class="icon icon-globe"></i>
       <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
-      <a class="uri" href={item.uri}>{item.uri}</a>
+      <a class="uri" href={item.uri}>{url.parse(item.uri).hostname}</a>
       <Timestamp class="created" relative value={item.created} />
      </div>`
 
