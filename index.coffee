@@ -132,7 +132,7 @@ auth = (options = {}) ->
 
   for provider, providerOptions of options
     strategy = require("passport-#{provider}").Strategy
-    passport.use new strategy(providerOptions)
+    passport.use new strategy(providerOptions, storeIdentity)
 
   app = express()
 

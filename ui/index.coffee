@@ -26,6 +26,22 @@ LocationAware =
   componentDidMount: ->
     this.router = new Backbone.Router(routes: this.routes)
 
+UserAware =
+  getUser: ->
+    try
+      JSON.parse localStorage.getItem('wall.user')
+    catch e
+      null
+
+  _handleStorageEvent: (e) ->
+    this.forceUpdate() if e.key == 'wall.user'
+
+  componentDidMount: ->
+    Backbone.$(window).on "storage", this._handleStorageEvent
+
+  componentWillUnmount: ->
+    Backbone.$(window).off "storage", this._handleStorageEvent
+
 HasModal =
   renderModal: ->
     if this.state?.modal
@@ -207,7 +223,7 @@ LoginDialog = React.createClass
      </div>`
 
 App = React.createClass
-  mixins: [AppEvents, DOMEvents, LocationAware, HasModal]
+  mixins: [AppEvents, DOMEvents, LocationAware, UserAware, HasModal]
 
   propTypes:
     title: React.PropTypes.string.isRequired
@@ -249,7 +265,7 @@ App = React.createClass
     this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
 
   renderControls: ->
-    controls = if this.state?.user?
+    controls = if this.getUser()?
       [Control(
         class: 'submit', icon: 'pencil', label: 'Submit',
         onClick: => this.showModal WriteScreen()),
