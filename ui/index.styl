@@ -197,8 +197,16 @@ textarea
     margin-bottom: padding-vertical * 3
 
 .ItemScreen
-  .ItemView
-    margin-bottom: padding-vertical * 3
+  .ItemView, .description
+    margin-bottom: padding-vertical * 2
+  .description
+    padding: padding-vertical padding-horizontal
+
+.FullItemView
+  &:hover
+    background: color-bg-highlight
+  .description
+    padding: padding-vertical padding-horizontal
 
 .ItemView
   icon-size = 20px

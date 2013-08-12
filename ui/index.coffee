@@ -101,6 +101,7 @@ ItemView = React.createClass
   propTypes:
     item: React.PropTypes.instanceOf(Item).isRequired
     externalLink: React.PropTypes.boolean
+
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
@@ -109,6 +110,17 @@ ItemView = React.createClass
       <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
       <a class="uri" href={item.uri}>{item.uri}</a>
       <Timestamp class="created" relative value={item.created} />
+     </div>`
+
+FullItemView = React.createClass
+  propTypes:
+    item: React.PropTypes.instanceOf(Item).isRequired
+
+  render: ->
+    item = this.props.item
+    `<div class="FullItemView">
+      <ItemView externalLink item={item} />
+      {item.description && <div class="description">{item.description}</div>}
      </div>`
 
 CommentEditor = React.createClass
@@ -133,16 +145,18 @@ ItemScreen = React.createClass
   onCommentCancel: ->
     this.setState(commentEditorShown: false)
 
-  render: ->
-    comments = if this.state?.commentEditorShown
+  renderCommentEditor: ->
+    if this.state?.commentEditorShown
       `<CommentEditor onCancel={this.onCommentCancel} />`
     else
       `<div class="Controls">
         <Control onClick={this.onAddComment} icon="comment" label="Add comment" />
        </div>`
+
+  render: ->
     `<div class="ItemScreen">
-      <ItemView externalLink item={this.props.model} />
-      {comments}
+      <FullItemView item={this.props.model} />
+      {this.renderCommentEditor()}
      </div>`
 
 WriteScreen = React.createClass
