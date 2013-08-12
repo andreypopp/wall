@@ -70,13 +70,22 @@ Screen =
 class User extends Record
 
 class Item extends Record
-  @define 'title', 'uri', 'description', 'created', 'creator'
+  @define
+    title: null
+    uri: null
+    description: null
+    created: null
+    creator: null
+    parent: null
+    comments: null
 
   url: -> if this.id? then "/api/items/#{this.id}" else "/api/items"
   screenURL: -> if this.id? then "/items/#{this.id}"
 
 class ItemCollection extends Backbone.Collection
   model: Item
+
+Item::schema.comments = ItemCollection
 
 class Items extends Record
   @define
@@ -100,8 +109,11 @@ ItemsScreen = React.createClass
   propTypes:
     model: React.PropTypes.instanceOf(Items).isRequired
   render: ->
-    items = this.props.model.items.map (item) => ItemView {item}
-    `<div class="ItemsScreen">{items}</div>`
+    children = if this.props.model.items.length > 0
+      this.props.model.items.map (item) => ItemView {item}
+    else
+      `<div class="empty"><i class="icon icon-off"></i></div>`
+    `<div class="ItemsScreen">{children}</div>`
 
 ItemView = React.createClass
   propTypes:
@@ -111,17 +123,24 @@ ItemView = React.createClass
   renderIcon: ->
     if this.props.item.uri
       `<i class="icon icon-globe"></i>`
-    else
+    else if this.props.item.title
       `<i class="icon icon-comments"></i>`
+    else
+      `<i class="icon icon-comment"></i>`
 
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
-    `<div class="ItemView">
-      {this.renderIcon()}
-      <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
-      <a class="uri" href={item.uri}>{url.parse(item.uri).hostname}</a>
-      <Timestamp class="created" relative value={item.created} />
+    console.log this.props
+    cls = "ItemView #{this.props.className or ''}"
+    `<div class={cls}>
+      <div class="meta">
+        {this.renderIcon()}
+        <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
+        <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>
+        <Timestamp class="created" relative value={item.created} />
+      </div>
+      {this.props.children}
      </div>`
 
 FullItemView = React.createClass
@@ -130,9 +149,19 @@ FullItemView = React.createClass
 
   render: ->
     item = this.props.item
-    `<div class="FullItemView">
-      <ItemView externalLink item={item} />
+    `<ItemView externalLink class="FullItemView" item={item}>
       {item.description && <div class="description">{item.description}</div>}
+     </ItemView>`
+
+CommentItemView = React.createClass
+  propTypes:
+    item: React.PropTypes.instanceOf(Item).isRequired
+
+  render: ->
+    `<div class="CommentItemView">
+      <i class="icon icon-comment"></i>
+      <div class="description">{this.props.item.description}</div>
+      <Timestamp class="created" relative value={this.props.item.created} />
      </div>`
 
 CommentEditor = React.createClass
@@ -142,12 +171,14 @@ CommentEditor = React.createClass
   componentDidMount: ->
     this.focus() if this.props.autofocus
 
+  onSubmit: ->
+    this.props.onSubmit this.refs.description.getDOMNode().value if this.props.onSubmit?
+
   render: ->
     `<div class="CommentEditor">
-      <i class="icon icon-comment"></i>
       <Textarea autosize ref="description" class="description" placeholder="Your comment"></Textarea>
       <div class="Controls">
-        <Control onClick={this.props.onSubmit} icon="ok" label="Submit" />
+        <Control onClick={this.onSubmit} icon="ok" label="Submit" />
         <Control onClick={this.props.onCancel} icon="remove" label="Cancel" />
       </div>
      </div>`
@@ -163,17 +194,31 @@ ItemScreen = React.createClass
   onCommentCancel: ->
     this.setState(commentEditorShown: false)
 
+  onCommentSubmit: (value) ->
+    if value
+      comment = new Item(description: value, parent: this.props.model.id)
+      this.props.model.comments.add(comment)
+      comment.save().then =>
+        this.setState(commentEditorShown: false)
+
   renderCommentEditor: ->
     if this.state?.commentEditorShown
-      `<CommentEditor autofocus onCancel={this.onCommentCancel} />`
+      `<CommentEditor autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
     else
       `<div class="Controls">
         <Control onClick={this.onAddComment} icon="comment" label="Discuss" />
        </div>`
 
+  renderComments: ->
+    if this.props.model.comments
+      comments = this.props.model.comments.map (comment) =>
+        CommentItemView(item: comment)
+      `<div class="Comments">{comments}</div>`
+
   render: ->
     `<div class="ItemScreen">
       <FullItemView item={this.props.model} />
+      {this.renderComments()}
       {this.renderCommentEditor()}
      </div>`
 

@@ -7,6 +7,7 @@
 
 ###
 
+{extend}    = require 'underscore'
 path        = require 'path'
 sqlite      = require 'sqlite3'
 kew         = require 'kew'
@@ -22,7 +23,7 @@ rel = path.join.bind(null, __dirname)
 promise = (func) ->
   (req, res, next) ->
     func(req, res, next)
-      .then (result) -> 
+      .then (result) ->
         if result == undefined then res.send 404 else res.send result
       .fail(next)
       .end()
@@ -40,6 +41,12 @@ asParams = (o) ->
   for k, v of o
     result["$#{k}"] = v.toString()
   result
+
+authOnly = (req, res, next) ->
+  unless req.user
+    res.send 401
+  else
+    next()
 
 sqlite.Database::promiseRun = promisify sqlite.Database::run
 sqlite.Database::promiseAll = promisify sqlite.Database::all
@@ -70,29 +77,40 @@ api = (options = {}) ->
       description text,
       created text,
       creator text,
+      parent text,
       primary key (id)
     );
     """
 
+  getCommentsFor = (item) ->
+    item = extend {}, item
+    db.promiseAll("select * from items where parent = $id", item.id)
+      .then (comments) ->
+        kew.all comments.map getCommentsFor
+      .then (comments) ->
+        item.comments = comments
+        item
+
   app = express()
 
   app.get '/items', promise (req, res) ->
-    db.promiseAll("select * from items order by created desc")
+    db.promiseAll("select * from items where parent is null order by created desc")
       .then (items) -> {items}
 
-  app.post '/items', promise (req, res) ->
+  app.post '/items', authOnly, promise (req, res) ->
     data = req.body
     data.id = uuid.v4()
     data.created = new Date
-    data.creator = 'user'
+    data.creator = req.user.id
     db.promiseRun("""
-      insert into items (id, title, uri, description, created, creator)
-      values ($id, $title, $uri, $description, $created, $creator)
+      insert into items (id, title, uri, description, created, creator, parent)
+      values ($id, $title, $uri, $description, $created, $creator, $parent)
       """, asParams(data))
         .then -> data
 
   app.get '/items/:id', promise (req, res) ->
     db.promiseGet("select * from items where id = $id", req.params.id)
+      .then getCommentsFor
 
   app.get '/users/:username', (req, res) ->
     res.send
@@ -103,7 +121,10 @@ api = (options = {}) ->
 auth = (options = {}) ->
 
   storeIdentity = (accessToken, refreshToken, profile, cb) ->
-    cb(null, profile)
+    user =
+      id: "#{profile.username}@#{profile.provider}"
+      displayName: profile.displayName
+    cb(null, user)
 
   authenticate = (req, res, next) ->
     provider = passport.authenticate req.params.provider
@@ -122,8 +143,6 @@ auth = (options = {}) ->
     """
 
   passport.serializeUser (user, done) ->
-    delete user._raw
-    delete user._json
     done(null, user)
 
   passport.deserializeUser (user, done) ->

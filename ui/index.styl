@@ -7,6 +7,7 @@ line-height = 1.428571429
 line-height-computed = floor(font-size * line-height)
 
 color-mute = #ddd
+color-super-mute = lighten(color-mute, 60%)
 color-text = #444
 color-link = #aeaeae
 color-link-hover = color-text
@@ -196,42 +197,52 @@ textarea
   .form
     margin-bottom: padding-vertical * 3
 
+.ItemsScreen
+  .ItemView
+    margin: padding-vertical 0
+  .empty
+    position: relative
+    font-size: 1000%
+    color: color-super-mute
+    min-height: 2em
+    .icon
+      display: block
+      position: absolute
+      top: 0
+      bottom: 0
+      left: 0
+      right: 0
+      height: 1em
+      width: 1em
+      margin: auto
+
 .ItemScreen
   .FullItemView
     margin-bottom: padding-vertical * 2
+    .description
+      padding: padding-large-vertical padding-large-horizontal
+  .Comments
+    margin-bottom: padding-vertical * 2
+  .CommentItemView
+    margin: padding-vertical 0
 
-.FullItemView
-  &:hover
-    background: color-bg-highlight
-  .description
-    padding: padding-large-vertical padding-large-horizontal
-
-.ItemView
-  icon-size = 20px
+HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
   padding: padding-vertical padding-horizontal
   padding-left: padding-horizontal * 2.5 + icon-size
   position: relative
-
-  &:hover
-    background: color-bg-highlight
-  .title
-    margin: 0
-  .icon
+  & > .icon
+    color: color-icon
     font-size: icon-size
     width: icon-size
     height: icon-size
-    color: color-mute
     position: absolute
     display: block
     margin: auto
     left: padding-horizontal * 1.5
-    top: 0
+    top: top
     bottom: 0
-  .uri
-    display: inline-block
-    color: color-mute
-    font-size: font-size-small
-    height: line-height-computed
+
+HasCreated()
   .created
     position: absolute
     display: block
@@ -243,19 +254,26 @@ textarea
     right: padding-horizontal
     color: color-mute
 
-.CommentEditor
-  icon-size = 20px
-  position: relative
-  padding: padding-vertical padding-horizontal
-  padding-left: padding-horizontal * 2 + icon-size
-  .icon-comment
-    position: absolute
+.CommentItemView
+  HasLeftIcon(15px)
+  HasCreated()
+  &:hover
+    background: color-bg-highlight
+
+
+.ItemView
+  .meta
+    HasLeftIcon(20px)
+    HasCreated()
+
+  &:hover
+    background: color-bg-highlight
+  .title
+    margin: 0
+  .uri
+    display: inline-block
     color: color-mute
-    left: padding-horizontal * 1.5
-    font-size: icon-size
-    height: icon-size
-    width: icon-size
-    top: padding-vertical * 1.5
+    font-size: font-size-small
 
 .LoginDialog
   @extend .Modalized
