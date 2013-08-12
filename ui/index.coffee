@@ -104,11 +104,17 @@ ItemView = React.createClass
     item: React.PropTypes.instanceOf(Item).isRequired
     externalLink: React.PropTypes.boolean
 
+  renderIcon: ->
+    if this.props.item.uri
+      `<i class="icon icon-globe"></i>`
+    else
+      `<i class="icon icon-comments"></i>`
+
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
     `<div class="ItemView">
-      <i class="icon icon-globe"></i>
+      {this.renderIcon()}
       <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
       <a class="uri" href={item.uri}>{url.parse(item.uri).hostname}</a>
       <Timestamp class="created" relative value={item.created} />
