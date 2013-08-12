@@ -145,7 +145,7 @@ CommentEditor = React.createClass
   render: ->
     `<div class="CommentEditor">
       <i class="icon icon-comment"></i>
-      <Textarea autosize ref="description" class="description" placeholder="Add comment"></Textarea>
+      <Textarea autosize ref="description" class="description" placeholder="Your comment"></Textarea>
       <div class="Controls">
         <Control onClick={this.props.onSubmit} icon="ok" label="Submit" />
         <Control onClick={this.props.onCancel} icon="remove" label="Cancel" />
@@ -168,7 +168,7 @@ ItemScreen = React.createClass
       `<CommentEditor autofocus onCancel={this.onCommentCancel} />`
     else
       `<div class="Controls">
-        <Control onClick={this.onAddComment} icon="comment" label="Add comment" />
+        <Control onClick={this.onAddComment} icon="comment" label="Discuss" />
        </div>`
 
   render: ->
