@@ -10,7 +10,7 @@
 ###
 
 url                           = require 'url'
-{extend, result, isFunction}  = require 'underscore'
+{extend, result, isArray}     = require 'underscore'
 Backbone                      = require 'backbone'
 Record                        = require 'backbone.record'
 Backbone.$                    = require 'jqueryify'
@@ -48,8 +48,12 @@ HasModal =
   renderModal: ->
     if this.state?.modal
       `<Modal ref="modal"
+        onShow={this.onModalShow}
         onHide={this.onModalHide}
         onClick={this.hideModal}>{this.state.modal}</Modal>` 
+
+  onModalShow: ->
+    this.refs.modal.focus()
 
   onModalHide: ->
     this.setState(modal: undefined)
@@ -179,6 +183,9 @@ SubmitDialog = React.createClass
   getInitialState: ->
     {model: new Item}
 
+  focus: ->
+    Backbone.$(this.refs.uri.getDOMNode()).focus()
+
   onSubmit: (e) ->
     e.preventDefault()
     data =
@@ -224,6 +231,12 @@ Modal = React.createClass
 
   componentWillUnmount: ->
     this.hide()
+
+  focus: ->
+    children = this.props.children
+    children = [children] unless isArray children
+    for child in children when child.focus?
+      child.focus()
 
   hide: ->
     this.$getDOMNode().modal 'hide'
