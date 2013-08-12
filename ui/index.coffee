@@ -100,11 +100,13 @@ ItemsScreen = React.createClass
 ItemView = React.createClass
   propTypes:
     item: React.PropTypes.instanceOf(Item).isRequired
+    externalLink: React.PropTypes.boolean
   render: ->
     item = this.props.item
+    mainLink = if this.props.externalLink then item.uri else item.screenURL()
     `<div class="ItemView">
       <i class="icon icon-globe"></i>
-      <h4 class="title"><a href={item.screenURL()}>{item.title}</a></h4>
+      <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
       <a class="uri" href={item.uri}>{item.uri}</a>
       <Timestamp class="created" relative value={item.created} />
      </div>`
@@ -139,7 +141,7 @@ ItemScreen = React.createClass
         <Control onClick={this.onAddComment} icon="comment" label="Add comment" />
        </div>`
     `<div class="ItemScreen">
-      <ItemView item={this.props.model} />
+      <ItemView externalLink item={this.props.model} />
       {comments}
      </div>`
 
