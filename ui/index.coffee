@@ -132,6 +132,12 @@ FullItemView = React.createClass
      </div>`
 
 CommentEditor = React.createClass
+  focus: ->
+    Backbone.$(this.refs.description.getDOMNode()).focus()
+
+  componentDidMount: ->
+    this.focus() if this.props.autofocus
+
   render: ->
     `<div class="CommentEditor">
       <i class="icon icon-comment"></i>
@@ -155,7 +161,7 @@ ItemScreen = React.createClass
 
   renderCommentEditor: ->
     if this.state?.commentEditorShown
-      `<CommentEditor onCancel={this.onCommentCancel} />`
+      `<CommentEditor autofocus onCancel={this.onCommentCancel} />`
     else
       `<div class="Controls">
         <Control onClick={this.onAddComment} icon="comment" label="Add comment" />
@@ -167,7 +173,7 @@ ItemScreen = React.createClass
       {this.renderCommentEditor()}
      </div>`
 
-WriteScreen = React.createClass
+SubmitDialog = React.createClass
   mixins: [Screen]
 
   getInitialState: ->
@@ -175,7 +181,7 @@ WriteScreen = React.createClass
 
   onSubmit: (e) ->
     e.preventDefault()
-    data = 
+    data =
       title: this.refs.title.getDOMNode().value
       uri: this.refs.uri.getDOMNode().value
       description: this.refs.description.getDOMNode().value
@@ -188,7 +194,7 @@ WriteScreen = React.createClass
 
   render: ->
     item = this.state.model
-    `<div class="WriteScreen">
+    `<div class="SubmitDialog">
       <div class="form">
         <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
         <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
@@ -294,7 +300,7 @@ App = React.createClass
     controls = if this.getUser()?
       [Control(
         class: 'submit', icon: 'pencil', label: 'Submit',
-        onClick: => this.showModal WriteScreen()),
+        onClick: => this.showModal SubmitDialog()),
        Control(
         class: 'logout', icon: 'signout',
         href: '/auth/logout', label: 'Sign out')]
