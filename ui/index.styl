@@ -221,10 +221,12 @@ textarea
     margin-bottom: padding-vertical * 2
     .description
       padding: padding-large-vertical padding-large-horizontal
-  .Comments
-    margin-bottom: padding-vertical * 2
   .CommentItemView
     margin: padding-vertical 0
+  & > .Comments > .CommentItemView > .Comments
+    margin-left: 2em
+  & > .Comments > .CommentItemView > .Comments > .CommentItemView > .Comments
+    margin-left: 2em
 
 HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
   padding: padding-vertical padding-horizontal
@@ -255,11 +257,31 @@ HasCreated()
     color: color-mute
 
 .CommentItemView
-  HasLeftIcon(15px)
-  HasCreated()
-  &:hover
-    background: color-bg-highlight
+  .Comments
+    margin-top: padding-vertical
+  .meta
+    HasLeftIcon(15px)
+    HasCreated()
+    position: relative
+    &:hover
+      background: color-bg-highlight
+      .Control
+        background: color-bg-highlight
+      .Controls
+        display: block
+      .created
+        display: none
+    .Controls
+      display: none
+      position: absolute
+      margin: auto
+      bottom: 0
+      top: 0
+      height: padding-vertical + line-height-computed
+      right: 0
 
+.CommentEditor
+  padding: padding-large-vertical padding-large-horizontal
 
 .ItemView
   .meta

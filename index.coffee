@@ -105,8 +105,9 @@ api = (options = {}) ->
     db.promiseRun("""
       insert into items (id, title, uri, description, created, creator, parent)
       values ($id, $title, $uri, $description, $created, $creator, $parent)
-      """, asParams(data))
-        .then -> data
+      """, asParams(data)).then ->
+          data.comments = []
+          data
 
   app.get '/items/:id', promise (req, res) ->
     db.promiseGet("select * from items where id = $id", req.params.id)

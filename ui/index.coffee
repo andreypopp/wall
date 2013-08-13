@@ -67,6 +67,28 @@ HasModal =
 Screen =
   url: -> result this.props.model, 'screenURL'
 
+HasComments =
+  onAddComment: ->
+    this.setState(commentEditorShown: true)
+
+  onCommentCancel: ->
+    this.setState(commentEditorShown: false)
+
+  onCommentSubmit: (value) ->
+    if value
+      comment = new Item(description: value, parent: this.props.model.id)
+      this.props.model.comments.add(comment)
+      comment.save().then =>
+        this.setState(commentEditorShown: false)
+
+  renderCommentEditor: ->
+    if this.state?.commentEditorShown
+      `<CommentEditor autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
+
+  renderComments: ->
+    if this.props.model.comments.length > 0
+      Comments(comments: this.props.model.comments)
+
 class User extends Record
 
 class Item extends Record
@@ -131,7 +153,6 @@ ItemView = React.createClass
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
-    console.log this.props
     cls = "ItemView #{this.props.className or ''}"
     `<div class={cls}>
       <div class="meta">
@@ -154,14 +175,25 @@ FullItemView = React.createClass
      </ItemView>`
 
 CommentItemView = React.createClass
+  mixins: [HasComments, Screen]
+
   propTypes:
-    item: React.PropTypes.instanceOf(Item).isRequired
+    model: React.PropTypes.instanceOf(Item).isRequired
 
   render: ->
+    item = this.props.model
     `<div class="CommentItemView">
-      <i class="icon icon-comment"></i>
-      <div class="description">{this.props.item.description}</div>
-      <Timestamp class="created" relative value={this.props.item.created} />
+      <div class="meta">
+        <i class="icon icon-comment"></i>
+        <div class="description">{item.description}</div>
+        <Timestamp class="created" relative value={item.created} />
+        <div class="Controls">
+          <Control onClick={this.onAddComment} icon="reply" />
+          <Control href={this.url()} icon="link" />
+        </div>
+      </div>
+      {this.renderComments()}
+      {this.renderCommentEditor()}
      </div>`
 
 CommentEditor = React.createClass
@@ -184,43 +216,29 @@ CommentEditor = React.createClass
      </div>`
 
 ItemScreen = React.createClass
-  mixins: [Screen]
+  mixins: [Screen, HasComments]
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
 
-  onAddComment: ->
-    this.setState(commentEditorShown: true)
-
-  onCommentCancel: ->
-    this.setState(commentEditorShown: false)
-
-  onCommentSubmit: (value) ->
-    if value
-      comment = new Item(description: value, parent: this.props.model.id)
-      this.props.model.comments.add(comment)
-      comment.save().then =>
-        this.setState(commentEditorShown: false)
-
-  renderCommentEditor: ->
-    if this.state?.commentEditorShown
-      `<CommentEditor autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
-    else
+  renderAddCommentButton: ->
+    unless this.state?.commentEditorShown
       `<div class="Controls">
         <Control onClick={this.onAddComment} icon="comment" label="Discuss" />
        </div>`
-
-  renderComments: ->
-    if this.props.model.comments
-      comments = this.props.model.comments.map (comment) =>
-        CommentItemView(item: comment)
-      `<div class="Comments">{comments}</div>`
 
   render: ->
     `<div class="ItemScreen">
       <FullItemView item={this.props.model} />
       {this.renderComments()}
       {this.renderCommentEditor()}
+      {this.renderAddCommentButton()}
      </div>`
+
+Comments = React.createClass
+  render: ->
+    comments = this.props.comments.map (comment) =>
+      CommentItemView(model: comment)
+    `<div class="Comments">{comments}</div>`
 
 SubmitDialog = React.createClass
   mixins: [Screen]
