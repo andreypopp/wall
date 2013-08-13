@@ -223,10 +223,12 @@ textarea
       padding: padding-large-vertical padding-large-horizontal
   .CommentItemView
     margin: padding-vertical 0
-  & > .Comments > .CommentItemView > .Comments
-    margin-left: 2em
-  & > .Comments > .CommentItemView > .Comments > .CommentItemView > .Comments
-    margin-left: 2em
+  & > .Comments > .CommentItemView
+    & > .Comments, & > .CommentEditor
+      margin-left: 2em
+  & > .Comments > .CommentItemView > .Comments > .CommentItemView
+    & > .Comments, & > .CommentEditor
+      margin-left: 2em
 
 HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
   padding: padding-vertical padding-horizontal

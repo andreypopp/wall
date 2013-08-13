@@ -192,8 +192,8 @@ CommentItemView = React.createClass
           <Control href={this.url()} icon="link" />
         </div>
       </div>
-      {this.renderComments()}
       {this.renderCommentEditor()}
+      {this.renderComments()}
      </div>`
 
 CommentEditor = React.createClass
