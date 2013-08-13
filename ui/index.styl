@@ -224,12 +224,12 @@ textarea
     margin-bottom: padding-vertical * 2
     .description
       padding: padding-large-vertical padding-large-horizontal
-  .CommentItemView
+  .CommentView
     margin: padding-vertical 0
-  & > .Comments > .CommentItemView
+  & > .Comments > .CommentView
     & > .Comments, & > .CommentEditor
       margin-left: 2em
-  & > .Comments > .CommentItemView > .Comments > .CommentItemView
+  & > .Comments > .CommentView > .Comments > .CommentView
     & > .Comments, & > .CommentEditor
       margin-left: 2em
 
@@ -249,24 +249,11 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     top: top
     bottom: 0
 
-HasCreated()
-  .created
-    position: absolute
-    display: block
-    margin: auto
-    font-size: font-size-small
-    top: 0
-    bottom: 0
-    height: line-height-computed
-    right: padding-horizontal
-    color: color-mute
-
-.CommentItemView
+.CommentView
   .Comments
     margin-top: padding-vertical
   .meta
     HasLeftIcon(15px)
-    HasCreated()
     position: relative
     &:hover
       background: color-bg-highlight
@@ -274,8 +261,6 @@ HasCreated()
         background: color-bg-highlight
       .Controls
         display: block
-      .created
-        display: none
     .Controls
       display: none
       position: absolute
@@ -284,6 +269,11 @@ HasCreated()
       top: 0
       height: padding-vertical + line-height-computed
       right: 0
+    .uri, .created, .creator
+      display: inline-block
+      color: color-mute
+      font-size: font-size-small
+      margin-right: padding-horizontal
 
 .CommentEditor
   padding: padding-large-vertical padding-large-horizontal
@@ -291,17 +281,17 @@ HasCreated()
 .ItemView
   .meta
     HasLeftIcon(20px)
-    HasCreated()
 
   &:hover
     background: color-bg-highlight
   .title
     margin: 0
-    height: line-height-computed
-  .uri
+    min-height: line-height-computed
+  .uri, .created, .creator
     display: inline-block
     color: color-mute
     font-size: font-size-small
+    margin-right: padding-horizontal
 
 .LoginDialog
   @extend .Modalized

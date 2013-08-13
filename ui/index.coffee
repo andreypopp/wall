@@ -20,6 +20,12 @@ DOMEvents                     = require 'react-dom-events'
 Textarea                      = require 'react-textarea-autosize'
 _BootstrapModal               = require './bootstrap-modal'
 
+username = (user) ->
+  user.split('@')[0]
+
+provider = (user) ->
+  user.split('@')[1]
+
 AppEvents = extend {}, Backbone.Events,
   componentWillUnmount: ->
     this.stopListening()
@@ -164,6 +170,7 @@ ItemView = React.createClass
         <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
         <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>
         <Timestamp class="created" relative value={item.created} />
+        <div class="creator">by {username(item.creator)} / {provider(item.creator)}</div>
       </div>
       {this.props.children}
      </div>`
@@ -178,7 +185,7 @@ FullItemView = React.createClass
       {item.description && <div class="description">{item.description}</div>}
      </ItemView>`
 
-CommentItemView = React.createClass
+CommentView = React.createClass
   mixins: [HasComments, HasScreen]
 
   propTypes:
@@ -186,11 +193,12 @@ CommentItemView = React.createClass
 
   render: ->
     item = this.props.model
-    `<div class="CommentItemView">
+    `<div class="CommentView">
       <div class="meta">
         <i class="icon icon-comment"></i>
         <div class="description">{item.description}</div>
         <Timestamp class="created" relative value={item.created} />
+        <div class="creator">by {username(item.creator)} / {provider(item.creator)}</div>
         <div class="Controls">
           <Control onClick={this.onAddComment} icon="reply" />
           <Control href={this.url()} icon="link" />
@@ -241,7 +249,7 @@ ItemScreen = React.createClass
 Comments = React.createClass
   render: ->
     comments = this.props.comments.map (comment) =>
-      CommentItemView(model: comment)
+      CommentView(model: comment)
     `<div class="Comments">{comments}</div>`
 
 SubmitDialog = React.createClass
