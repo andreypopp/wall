@@ -134,7 +134,11 @@ ItemsScreen = React.createClass
     children = if this.props.model.items.length > 0
       this.props.model.items.map (item) => ItemView {item}
     else
-      `<div class="empty"><i class="icon icon-off"></i></div>`
+      `<div class="empty">
+        <div class="off">
+          <i class="icon icon-pencil"></i><div class="text">found something?</div>
+        </div>
+       </div>`
     `<div class="ItemsScreen">{children}</div>`
 
 ItemView = React.createClass
