@@ -227,10 +227,14 @@ textarea
   .CommentView
     margin: padding-vertical 0
   & > .Comments > .CommentView
-    & > .Comments, & > .CommentEditor
+    & > .Comments
+      margin-left: 2em
+    & > .CommentEditor
       margin-left: 2em
   & > .Comments > .CommentView > .Comments > .CommentView
-    & > .Comments, & > .CommentEditor
+    & > .Comments
+      margin-left: 2em
+    & > .CommentEditor
       margin-left: 2em
 
 HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
@@ -250,7 +254,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     bottom: 0
 
 .CommentView
-  .Comments
+  .Comments, .CommentEditor
     margin-top: padding-vertical
   .meta
     HasLeftIcon(15px)
@@ -264,9 +268,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     .Controls
       display: none
       position: absolute
-      margin: auto
       bottom: 0
-      top: 0
       height: padding-vertical + line-height-computed
       right: 0
     .uri, .created, .creator
@@ -276,7 +278,15 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
       margin-right: padding-horizontal
 
 .CommentEditor
-  padding: padding-large-vertical padding-large-horizontal
+  background: color-bg-highlight
+  textarea
+    padding: padding-vertical padding-horizontal
+    background: color-bg-highlight
+    border: none
+  .Controls
+    text-align: right
+  .Control
+    background: color-bg-highlight
 
 .ItemView
   .meta

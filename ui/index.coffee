@@ -222,8 +222,8 @@ CommentEditor = React.createClass
     `<div class="CommentEditor">
       <Textarea autosize ref="description" class="description" placeholder="Your comment"></Textarea>
       <div class="Controls">
-        <Control onClick={this.onSubmit} icon="ok" label="Submit" />
-        <Control onClick={this.props.onCancel} icon="remove" label="Cancel" />
+        <Control onClick={this.onSubmit} icon="ok" />
+        <Control onClick={this.props.onCancel} icon="remove" />
       </div>
      </div>`
 
