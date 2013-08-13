@@ -64,7 +64,7 @@ HasModal =
   hideModal: ->
     this.refs.modal.hide()
 
-Screen =
+HasScreen =
   url: -> result this.props.model, 'screenURL'
 
 HasComments =
@@ -127,7 +127,7 @@ Control = React.createClass
      </a>`
 
 ItemsScreen = React.createClass
-  mixins: [Screen]
+  mixins: [HasScreen]
   propTypes:
     model: React.PropTypes.instanceOf(Items).isRequired
   render: ->
@@ -175,7 +175,7 @@ FullItemView = React.createClass
      </ItemView>`
 
 CommentItemView = React.createClass
-  mixins: [HasComments, Screen]
+  mixins: [HasComments, HasScreen]
 
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
@@ -216,7 +216,7 @@ CommentEditor = React.createClass
      </div>`
 
 ItemScreen = React.createClass
-  mixins: [Screen, HasComments]
+  mixins: [HasScreen, HasComments]
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
 
@@ -241,7 +241,7 @@ Comments = React.createClass
     `<div class="Comments">{comments}</div>`
 
 SubmitDialog = React.createClass
-  mixins: [Screen]
+  mixins: [HasScreen]
 
   getInitialState: ->
     {model: new Item}
