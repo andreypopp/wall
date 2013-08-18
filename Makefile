@@ -14,6 +14,9 @@ develop:
 
 build: $(LIB)
 
+shell:
+	@$(BIN)/coffee
+
 %.js: %.coffee
 	@mkdir -p $(@D)
 	@$(BIN)/coffee -bcp $< > $@
@@ -24,8 +27,8 @@ clean:
 install link:
 	@npm $@
 
-test:
-	@$(BIN)/mocha -b -R spec --compilers coffee:coffee-script ./spec.coffee
+test specs:
+	@$(BIN)/mocha -b -R spec --compilers coffee:coffee-script ./specs.coffee
 
 release-patch: build test
 	@$(call release,patch)
