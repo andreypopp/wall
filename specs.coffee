@@ -1,31 +1,34 @@
 {ok, equal: eq} = require 'assert'
 {all}           = require 'kew'
+{extend}        = require 'underscore'
 uuid            = require 'node-uuid'
 express         = require 'express'
 request         = require 'supertest'
 {api}           = require './index'
 db              = require './db'
 
+makeItem = (data = {}) ->
+  extend {creator: TEST_USER.id}, data
+
 TEST_DATABASE = 'postgres://localhost/walltest'
 TEST_USER = {id: 1, username: 'user'}
+
 TEST_ITEM_ID = uuid.v4()
 TEST_ITEM_ID_2 = uuid.v4()
+
 TEST_ITEMS = [
-  {id: TEST_ITEM_ID, creator: TEST_USER.id, title: 'title', uri: 'http://example.com'},
-  {creator: TEST_USER.id, post: 'post', uri: 'http://example.com'},
-  {id: TEST_ITEM_ID_2, creator: TEST_USER.id, post: 'post', uri: 'http://example.com', parent: TEST_ITEM_ID},
-  {creator: TEST_USER.id, post: 'post', uri: 'http://example.com', parent: TEST_ITEM_ID_2},
+  makeItem(),
+  makeItem(id: TEST_ITEM_ID),
+  makeItem(id: TEST_ITEM_ID_2, parent: TEST_ITEM_ID),
+  makeItem(parent: TEST_ITEM_ID_2)
 ]
 
-
 before (done) ->
-  db.connect TEST_DATABASE, (err, conn) ->
-    return done(err) if err
-    db.query(conn, "TRUNCATE items").then ->
-      promises = for item in TEST_ITEMS
-        q = db.items.insert(item)
-        db.query(conn, q)
-      all(promises).fin(done)
+  db.connect(TEST_DATABASE)
+    .then (conn) ->
+      db.query(conn, "TRUNCATE items").then ->
+        all(db.query(conn, db.items.insert item) for item in TEST_ITEMS)
+    .fin(done)
 
 describe 'api', ->
 

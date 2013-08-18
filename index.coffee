@@ -56,13 +56,13 @@ api = (options = {}) ->
 
   app.get '/items', promise (req, res) ->
     q = "select * from items where parent is null order by created desc"
-    queryRows(req.db, q).then (items) -> {items}
+    queryRows(req.conn, q).then (items) -> {items}
 
   app.post '/items', authOnly, promise (req, res) ->
     data = req.body or {}
     data.creator = req.user.id
     q = items.insert(data).returning(items.star())
-    queryRow(req.db, q)
+    queryRow(req.conn, q)
 
   app.get '/items/:id', promise (req, res) ->
     itemQuery = "select * from items where id = $1"
@@ -82,8 +82,8 @@ api = (options = {}) ->
         parent = mapping[item.parent]
         (parent.comments or= []).push(item) if parent
 
-    item = queryRow(req.db, itemQuery, req.params.id)
-    comments = queryRows(req.db, commentsQuery, req.params.id)
+    item = queryRow(req.conn, itemQuery, req.params.id)
+    comments = queryRows(req.conn, commentsQuery, req.params.id)
     all(item, comments).then ([item, comments]) ->
       deserializeTree item, comments
       item

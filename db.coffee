@@ -7,23 +7,33 @@
 
 ###
 
-kew         = require 'kew'
+{defer}     = require 'kew'
 pg          = require 'pg'
 sql         = require 'sql'
 {extend}    = require 'underscore'
 
 withDB = (database) ->
   (req, res, next) ->
-    pg.connect database, (err, db, done) ->
-      res.on 'finish', -> query(db, "ROLLBACK").fin(done)
-      query(db, "BEGIN").then ->
-        return next err if err
-        req.db = db
-        next()
+    connect(database).then (conn) ->
+      res.on 'finish', ->
+        query(conn, "ROLLBACK").fin(conn.release)
+      query(conn, "BEGIN")
+        .then(-> req.conn = conn)
+        .fin(next)
+
+connect = (uri) ->
+  promise = defer()
+  pg.connect uri, (err, conn, done) ->
+    if err
+      promise.reject(err)
+    else
+      conn.release = done
+      promise.resolve(conn)
+  promise
 
 query = (db, text, values...) ->
   {text, values}  = text.toQuery() if text.toQuery?
-  promise = kew.defer()
+  promise = defer()
   db.query text, values, (err, result) ->
     if err then promise.reject(err) else promise.resolve(result)
   promise
@@ -41,4 +51,4 @@ items = sql.define
     'created', 'updated', 'creator',
     'parent', 'child_count']
 
-module.exports = extend pg, {items, withDB, query, queryRows, queryRow}
+module.exports = extend {}, pg, {items, withDB, connect, query, queryRows, queryRow}
