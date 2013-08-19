@@ -186,12 +186,24 @@ CommentEditor = React.createClass
   componentDidMount: ->
     this.focus() if this.props.autofocus
 
+  getValue: ->
+    this.refs.post.getDOMNode().value.trim() or null
+
   onSubmit: ->
-    this.props.onSubmit(this.refs.post.getDOMNode().value or null) if this.props.onSubmit?
+    this.props.onSubmit?(this.getValue())
+
+  onKeyDown: (e) ->
+    if e.keyCode == 27
+      e.preventDefault()
+      this.props.onCancel?()
+    else if e.keyCode == 13 and (e.ctrlKey or e.metaKey)
+      e.preventDefault()
+      this.props.onSubmit?(this.getValue())
 
   render: ->
     `<div class="CommentEditor">
-      <Textarea autosize ref="post" class="post" placeholder="Your comment"></Textarea>
+      <Textarea onKeyDown={this.onKeyDown} autosize
+        ref="post" class="post" placeholder="Your comment"></Textarea>
       <div class="Controls">
         <Control onClick={this.onSubmit} icon="ok" />
         <Control onClick={this.props.onCancel} icon="remove" />
@@ -236,8 +248,7 @@ SubmitDialog = React.createClass
     this.listenTo this.state.model, 'invalid', =>
       animate this.getDOMNode(), 'invalid'
 
-  onSubmit: (e) ->
-    e.preventDefault()
+  submit: ->
     data =
       title: this.refs.title.getDOMNode().value or null
       uri: this.refs.uri.getDOMNode().value or null
@@ -248,22 +259,34 @@ SubmitDialog = React.createClass
         Wall.show(new ItemScreen(model: this.state.model), trigger: true)
         Wall.hideModal()
 
-  onCancel: ->
+  cancel: ->
     Wall.hideModal()
+
+  onSubmit: (e) ->
+    e.preventDefault()
+    this.submit()
+
+  onKeyDown: (e) ->
+    if e.keyCode == 13 and (e.ctrlKey or e.metaKey)
+      e.preventDefault()
+      this.submit()
 
   render: ->
     item = this.state.model
     `<div class="SubmitDialog">
       <div class="form">
-        <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
-        <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
-        <Textarea autosize class="post" ref="post" placeholder="Description">
+        <input onKeyDown={this.onKeyDown}
+          type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
+        <input onKeyDown={this.onKeyDown}
+          type="text" class="title" ref="title" value={item.title} placeholder="Title" />
+        <Textarea onKeyDown={this.onKeyDown}
+          autosize class="post" ref="post" placeholder="Description">
           {item.post}
         </Textarea>
       </div>
       <div class="Controls">
         <Control onClick={this.onSubmit} icon="ok" label="Submit" />
-        <Control onClick={this.onCancel} icon="remove" label="Cancel" />
+        <Control onClick={this.cancel} icon="remove" label="Cancel" />
       </div>
      </div>`
 
