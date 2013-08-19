@@ -18,10 +18,17 @@ React                         = require 'react-tools/build/modules/react'
 Timestamp                     = require 'react-time'
 DOMEvents                     = require 'react-dom-events'
 Textarea                      = require 'react-textarea-autosize'
+{Item, Items}                 = require '../models'
 _BootstrapModal               = require './bootstrap-modal'
 
 username = (user) ->
   user.split('@')[0]
+
+animate = (node, animation) ->
+  $node = $ node
+  $node.one 'oanimationend animationend webkitAnimationEnd', ->
+    $node.removeClass animation
+  $node.addClass animation
 
 AppEvents = extend {}, Backbone.Events,
   componentWillUnmount: ->
@@ -78,46 +85,21 @@ HasComments =
     this.setState(commentEditorShown: false)
 
   onCommentSubmit: (value) ->
-    if value
-      comment = new Item(post: value, parent: this.props.model.id)
+    comment = new Item(post: value, parent: this.props.model.id)
+    if comment.isValid()
       this.props.model.comments.add(comment)
       comment.save().then =>
         this.setState(commentEditorShown: false)
+    else
+      animate this.refs.commentEditor.getDOMNode(), 'invalid'
 
   renderCommentEditor: ->
     if this.state?.commentEditorShown
-      `<CommentEditor autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
+      `<CommentEditor ref="commentEditor" autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
 
   renderComments: ->
     if this.props.model.comments?.length > 0
       Comments(comments: this.props.model.comments)
-
-class User extends Record
-
-class Item extends Record
-  @define
-    title: null
-    uri: null
-    post: null
-    created: null
-    creator: null
-    parent: null
-    comments: null
-
-  url: -> if this.id? then "/api/items/#{this.id}" else "/api/items"
-  screenURL: -> if this.id? then "/items/#{this.id}"
-
-class ItemCollection extends Backbone.Collection
-  model: Item
-
-Item::schema.comments = ItemCollection
-
-class Items extends Record
-  @define
-    items: ItemCollection
-
-  url: -> '/api/items'
-  screenURL: -> '/'
 
 Control = React.createClass
   render: ->
@@ -202,7 +184,7 @@ CommentEditor = React.createClass
     this.focus() if this.props.autofocus
 
   onSubmit: ->
-    this.props.onSubmit this.refs.post.getDOMNode().value if this.props.onSubmit?
+    this.props.onSubmit(this.refs.post.getDOMNode().value or null) if this.props.onSubmit?
 
   render: ->
     `<div class="CommentEditor">
@@ -239,7 +221,7 @@ Comments = React.createClass
     `<div class="Comments">{comments}</div>`
 
 SubmitDialog = React.createClass
-  mixins: [HasScreen]
+  mixins: [HasScreen, AppEvents]
 
   getInitialState: ->
     {model: new Item}
@@ -247,15 +229,21 @@ SubmitDialog = React.createClass
   focus: ->
     Backbone.$(this.refs.uri.getDOMNode()).focus()
 
+  componentDidMount: ->
+    this.listenTo this.state.model, 'invalid', =>
+      animate this.getDOMNode(), 'invalid'
+
   onSubmit: (e) ->
     e.preventDefault()
     data =
-      title: this.refs.title.getDOMNode().value
-      uri: this.refs.uri.getDOMNode().value
-      post: this.refs.post.getDOMNode().value
-    this.state.model.save(data).then =>
-      Wall.show(new ItemScreen(model: this.state.model), trigger: true)
-      Wall.hideModal()
+      title: this.refs.title.getDOMNode().value or null
+      uri: this.refs.uri.getDOMNode().value or null
+      post: this.refs.post.getDOMNode().value or null
+    this.state.model.set(data, validate: true)
+    unless this.state.model.validationError
+      this.state.model.save(data).then =>
+        Wall.show(new ItemScreen(model: this.state.model), trigger: true)
+        Wall.hideModal()
 
   onCancel: ->
     Wall.hideModal()
@@ -275,10 +263,6 @@ SubmitDialog = React.createClass
         <Control onClick={this.onCancel} icon="remove" label="Cancel" />
       </div>
      </div>`
-
-UserView = React.createClass
-  render: ->
-    `<div class="User"></div>`
 
 Modal = React.createClass
   $getDOMNode: ->

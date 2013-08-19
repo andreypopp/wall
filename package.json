@@ -52,7 +52,7 @@
     "nib": "~0.9.2",
     "font-awesome": "git+https://github.com/andreypopp/Font-Awesome.git",
     "react-tools": "~0.4.1",
-    "backbone.record": "~0.9.1",
+    "backbone.record": "~1.0.0",
     "backbone": "~1.0.0",
     "underscore": "~1.5.1",
     "react-time": "~0.3.0",

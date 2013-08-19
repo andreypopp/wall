@@ -311,3 +311,18 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     position: absolute
     bottom: 0
     left: 0
+
+.invalid
+  animation: shake .4s linear
+
+@keyframes shake
+  8%, 41%
+    transform: translateX(-10px)
+  25%, 58%
+    transform: translateX(10px)
+  75%
+    transform: translateX(-5px)
+  92%
+    transform: translateX(5px)
+  0%, 100%
+    transform: translateX(0)
