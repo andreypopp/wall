@@ -95,7 +95,9 @@ HasComments =
 
   renderCommentEditor: ->
     if this.state?.commentEditorShown
-      `<CommentEditor ref="commentEditor" autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
+      `<CommentEditor ref="commentEditor" autofocus
+          onSubmit={this.onCommentSubmit}
+          onCancel={this.onCommentCancel} />`
 
   renderComments: ->
     if this.props.model.comments?.length > 0
@@ -121,7 +123,8 @@ ItemsScreen = React.createClass
     else
       `<div class="empty">
         <div class="off">
-          <i class="icon icon-pencil"></i><div class="text">found something?</div>
+          <i class="icon icon-pencil"></i>
+          <div class="text">found something?</div>
         </div>
        </div>`
     `<div class="ItemsScreen">{children}</div>`
