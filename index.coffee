@@ -14,7 +14,6 @@ express                               = require 'express'
 page                                  = require 'connect-page'
 stylus                                = require 'connect-stylus'
 browserify                            = require 'connect-browserify'
-{validateBody}                        = require 'schematron/lib/middleware'
 passport                              = require 'passport'
 {commit, rollback,
   queryRow, queryRows, withDB, items} = require './db'
