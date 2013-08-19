@@ -11,8 +11,8 @@ loadConfig = (module) ->
 commander
   .version(pkg.version)
   .option('-d, --database [uri]', 'Database to use')
-  .option('-c, --config [config]', 'Configuration file')
-  .option('-p, --port  [port]', 'Port to listen on')
+  .option('-c, --config [config]', 'Configuration file (default: wall.json)')
+  .option('-p, --port [port]', 'Port to listen on (default: 3004)')
   .parse(process.argv)
 
 config = loadConfig(commander.config or path.join(__dirname, 'wall.json'))
