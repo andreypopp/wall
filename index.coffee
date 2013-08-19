@@ -17,6 +17,7 @@ browserify                            = require 'connect-browserify'
 passport                              = require 'passport'
 {commit, rollback,
   queryRow, queryRows, withDB, items} = require './db'
+{Item}                                = require './models'
 
 rel = path.join.bind(null, __dirname)
 
@@ -36,6 +37,18 @@ commitDB = (handler) ->
     handler(req, res, next)
       .then (result) ->
         commit(req.conn).then -> result
+
+model = (modelClass) ->
+  (req, res, next) ->
+    try
+      m = new modelClass(req.body, parse: true)
+    catch e
+      return next(e)
+    unless m.isValid()
+      res.send 400, m.validationError
+    else
+      req.model = m
+      next()
 
 assets = (options = {}) ->
   app = express()
@@ -61,7 +74,7 @@ api = (options = {}) ->
     q = "select * from items where parent is null order by created desc"
     queryRows(req.conn, q).then (items) -> {items}
 
-  app.post '/items', authOnly, promise commitDB (req, res) ->
+  app.post '/items', authOnly, model(Item), promise commitDB (req, res) ->
     data = req.body or {}
     data.creator = req.user.id
     q = items.insert(data).returning(items.star())

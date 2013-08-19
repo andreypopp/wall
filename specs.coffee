@@ -52,32 +52,45 @@ describe 'api', ->
       ok item.creator
       ok item.comments
 
-    create = (data, assertBody) ->
-      request(makeApp())
+    create = (data, anonymous) ->
+      request(makeApp(anonymous: anonymous))
         .post('/items')
         .send(data)
         .expect(200)
 
-    it 'creates a new item', (done) ->
-      create().end (err, res) ->
-        assertItemCreated res.body
-        done(err)
+    it 'fails to create an item with a title only', (done) ->
+      create(title: 'Title')
+        .expect(400)
+        .end(done)
 
-    it 'creates a new item with a title', (done) ->
-      create(title: 'Title').end (err, res) ->
+    it 'fails to create an item with an uri only', (done) ->
+      create(uri: 'http://example.com')
+        .expect(400)
+        .end(done)
+
+    it 'fails to create an item with a post only', (done) ->
+      create(post: 'post')
+        .expect(400)
+        .end(done)
+
+    it 'creates a new item with a title and an uri', (done) ->
+      create(title: 'Title', uri: 'http://example.com').end (err, res) ->
         assertItemCreated res.body
         eq res.body.title, 'Title'
-        done(err)
-
-    it 'creates a new item with a URI', (done) ->
-      create(uri: 'http://example.com').end (err, res) ->
-        assertItemCreated res.body
         eq res.body.uri, 'http://example.com'
         done(err)
 
-    it 'creates a new item with a post', (done) ->
-      create(post: 'some text').end (err, res) ->
+    it 'creates a new item with a title and a post', (done) ->
+      create(title: 'Title', post: 'some text').end (err, res) ->
         assertItemCreated res.body
+        eq res.body.title, 'Title'
+        eq res.body.post, 'some text'
+        done(err)
+
+    it 'creates a new item with a parent and a post', (done) ->
+      create(parent: TEST_ITEM_ID, post: 'some text').end (err, res) ->
+        assertItemCreated res.body
+        eq res.body.parent, TEST_ITEM_ID
         eq res.body.post, 'some text'
         done(err)
 
