@@ -16,7 +16,7 @@ color-bg = #fafafa
 color-bg-input = color-bg
 color-bg-highlight = lighten(color-bg, 70%)
 color-bg-modal-backdrop = darken(color-bg, 3%)
-color-border-input = color-mute
+color-border-input = color-super-mute
 
 headings-font-family = font-family
 headings-font-weight = bold
@@ -237,7 +237,7 @@ textarea
 
 HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
   padding: padding-vertical padding-horizontal
-  padding-left: padding-horizontal * 2.5 + icon-size
+  padding-left: padding-horizontal * 3.5 + icon-size
   position: relative
   & > .icon
     color: color-icon
@@ -247,7 +247,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     position: absolute
     display: block
     margin: auto
-    left: padding-horizontal * 1.5
+    left: padding-horizontal * 2
     top: top
     bottom: 0
 
@@ -294,6 +294,8 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     color: color-mute
     font-size: font-size-small
     margin-right: 0.5em
+  .post
+    margin: padding-vertical 0
 
 .LoginDialog
   @extend .Modalized

@@ -166,7 +166,7 @@ ItemView = React.createClass
       <div class="meta">
         {this.renderIcon()}
         {item.title && <h4 class="title"><a href={mainLink}>{item.title}</a></h4>}
-        {this.props.full && item.post && <div class="post">{item.post}</div>}
+        {item.post && this.props.full && <div class="post">{item.post}</div>}
         {item.uri && <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>}
         <Timestamp class="created" relative value={item.created} />
         <div class="creator">by {username(item.creator)}</div>
