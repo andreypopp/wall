@@ -23,9 +23,6 @@ _BootstrapModal               = require './bootstrap-modal'
 username = (user) ->
   user.split('@')[0]
 
-provider = (user) ->
-  user.split('@')[1]
-
 AppEvents = extend {}, Backbone.Events,
   componentWillUnmount: ->
     this.stopListening()
@@ -151,6 +148,7 @@ ItemView = React.createClass
   propTypes:
     item: React.PropTypes.instanceOf(Item).isRequired
     externalLink: React.PropTypes.boolean
+    full: React.PropTypes.boolean
 
   renderIcon: ->
     if this.props.item.uri
@@ -167,23 +165,14 @@ ItemView = React.createClass
     `<div class={cls}>
       <div class="meta">
         {this.renderIcon()}
-        <h4 class="title"><a href={mainLink}>{item.title}</a></h4>
-        <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>
+        {item.title && <h4 class="title"><a href={mainLink}>{item.title}</a></h4>}
+        {this.props.full && item.post && <div class="post">{item.post}</div>}
+        {item.uri && <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>}
         <Timestamp class="created" relative value={item.created} />
-        <div class="creator">by {username(item.creator)} / {provider(item.creator)}</div>
+        <div class="creator">by {username(item.creator)}</div>
       </div>
       {this.props.children}
      </div>`
-
-FullItemView = React.createClass
-  propTypes:
-    item: React.PropTypes.instanceOf(Item).isRequired
-
-  render: ->
-    item = this.props.item
-    `<ItemView externalLink class="FullItemView" item={item}>
-      {item.post && <div class="post">{item.post}</div>}
-     </ItemView>`
 
 CommentView = React.createClass
   mixins: [HasComments, HasScreen]
@@ -195,10 +184,7 @@ CommentView = React.createClass
     item = this.props.model
     `<div class="CommentView">
       <div class="meta">
-        <i class="icon icon-comment"></i>
-        <div class="post">{item.post}</div>
-        <Timestamp class="created" relative value={item.created} />
-        <div class="creator">by {username(item.creator)} / {provider(item.creator)}</div>
+        <ItemView full item={this.props.model} />
         <div class="Controls">
           <Control onClick={this.onAddComment} icon="reply" />
           <Control href={this.url()} icon="link" />
@@ -240,7 +226,7 @@ ItemScreen = React.createClass
 
   render: ->
     `<div class="ItemScreen">
-      <FullItemView item={this.props.model} />
+      <ItemView full item={this.props.model} />
       {this.renderComments()}
       {this.renderCommentEditor()}
       {this.renderAddCommentButton()}

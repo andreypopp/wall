@@ -6,7 +6,7 @@ font-size-small = ceil(font-size * 0.85)
 line-height = 1.428571429
 line-height-computed = floor(font-size * line-height)
 
-color-mute = #ddd
+color-mute = #bbb
 color-super-mute = lighten(color-mute, 60%)
 color-text = #444
 color-link = #aeaeae
@@ -220,10 +220,8 @@ textarea
         font-size: 40%
 
 .ItemScreen
-  .FullItemView
+  .ItemView
     margin-bottom: padding-vertical * 2
-    .post
-      padding: padding-large-vertical padding-large-horizontal
   .CommentView
     margin: padding-vertical 0
   & > .Comments > .CommentView
@@ -254,10 +252,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     bottom: 0
 
 .CommentView
-  .Comments, .CommentEditor
-    margin-top: padding-vertical
-  .meta
-    HasLeftIcon(15px)
+  & > .meta
     position: relative
     &:hover
       background: color-bg-highlight
@@ -265,17 +260,15 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
         background: color-bg-highlight
       .Controls
         display: block
+
     .Controls
       display: none
       position: absolute
       bottom: 0
       height: padding-vertical + line-height-computed
       right: 0
-    .uri, .created, .creator
-      display: inline-block
-      color: color-mute
-      font-size: font-size-small
-      margin-right: padding-horizontal
+  .Comments, .CommentEditor
+    margin-top: padding-vertical
 
 .CommentEditor
   background: color-bg-highlight
@@ -291,7 +284,6 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
 .ItemView
   .meta
     HasLeftIcon(20px)
-
   &:hover
     background: color-bg-highlight
   .title
@@ -301,7 +293,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     display: inline-block
     color: color-mute
     font-size: font-size-small
-    margin-right: padding-horizontal
+    margin-right: 0.5em
 
 .LoginDialog
   @extend .Modalized
