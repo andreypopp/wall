@@ -13,17 +13,18 @@ makeItem = (data = {}) ->
 TEST_DATABASE = 'postgres://localhost/walltest'
 TEST_USER = {id: 1, username: 'user'}
 
+TEST_ITEM_ID_NO_COMMENTS = uuid.v4()
 TEST_ITEM_ID = uuid.v4()
 TEST_ITEM_ID_2 = uuid.v4()
 
 TEST_ITEMS = [
-  makeItem(),
+  makeItem(id: TEST_ITEM_ID_NO_COMMENTS),
   makeItem(id: TEST_ITEM_ID),
   makeItem(id: TEST_ITEM_ID_2, parent: TEST_ITEM_ID),
   makeItem(parent: TEST_ITEM_ID_2)
 ]
 
-before (done) ->
+beforeEach (done) ->
   db.connect(TEST_DATABASE)
     .then (conn) ->
       db.query(conn, "TRUNCATE items").then ->
@@ -49,6 +50,7 @@ describe 'api', ->
       ok item.created
       ok item.updated
       ok item.creator
+      ok item.comments
 
     create = (data, assertBody) ->
       request(makeApp())
@@ -93,7 +95,18 @@ describe 'api', ->
 
   describe 'getting a single item', ->
 
-    it 'fetches a single item', (done) ->
+    it 'fetches a single item without comments', (done) ->
+      request(makeApp())
+        .get("/items/#{TEST_ITEM_ID_NO_COMMENTS}")
+        .expect(200)
+        .end (err, res) ->
+          ok res.body
+          eq res.body.id, TEST_ITEM_ID_NO_COMMENTS
+          ok res.body.comments
+          eq res.body.comments.length, 0
+          done(err)
+
+    it 'fetches a single item with comments', (done) ->
       request(makeApp())
         .get("/items/#{TEST_ITEM_ID}")
         .expect(200)

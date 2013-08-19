@@ -16,7 +16,8 @@ stylus                                = require 'connect-stylus'
 browserify                            = require 'connect-browserify'
 {validateBody}                        = require 'schematron/lib/middleware'
 passport                              = require 'passport'
-{queryRow, queryRows, withDB, items}  = require './db'
+{commit, rollback,
+  queryRow, queryRows, withDB, items} = require './db'
 
 rel = path.join.bind(null, __dirname)
 
@@ -29,10 +30,13 @@ promise = (func) ->
       .end()
 
 authOnly = (req, res, next) ->
-  unless req.user
-    res.send 401
-  else
-    next()
+  unless req.user then res.send 401 else next()
+
+commitDB = (handler) ->
+  (req, res, next) ->
+    handler(req, res, next)
+      .then (result) ->
+        commit(req.conn).then -> result
 
 assets = (options = {}) ->
   app = express()
@@ -58,11 +62,13 @@ api = (options = {}) ->
     q = "select * from items where parent is null order by created desc"
     queryRows(req.conn, q).then (items) -> {items}
 
-  app.post '/items', authOnly, promise (req, res) ->
+  app.post '/items', authOnly, promise commitDB (req, res) ->
     data = req.body or {}
     data.creator = req.user.id
     q = items.insert(data).returning(items.star())
-    queryRow(req.conn, q)
+    queryRow(req.conn, q).then (item) ->
+      item.comments = []
+      item
 
   app.get '/items/:id', promise (req, res) ->
     itemQuery = "select * from items where id = $1"
@@ -77,10 +83,12 @@ api = (options = {}) ->
     deserializeTree = (root, items) ->
       mapping = {}
       mapping[root.id] = root
+      root.comments = []
       for item in items
+        item.comments = []
         mapping[item.id] = item
         parent = mapping[item.parent]
-        (parent.comments or= []).push(item) if parent
+        parent.comments.push(item) if parent
 
     item = queryRow(req.conn, itemQuery, req.params.id)
     comments = queryRows(req.conn, commentsQuery, req.params.id)
