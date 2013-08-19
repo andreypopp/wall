@@ -4,12 +4,20 @@ commander = require 'commander'
 makeApp   = require './index'
 pkg       = require path.join(__dirname, 'package.json')
 
+loadConfig = (module) ->
+  module = "./#{module}" unless module[0] == '/'
+  require module
+
 commander
   .version(pkg.version)
+  .option('-d, --database [uri]', 'Database to use')
   .option('-c, --config [config]', 'Configuration file')
   .option('-p, --port  [port]', 'Port to listen on')
   .parse(process.argv)
 
-config = require(commander.config or path.join(__dirname, 'wall.json'))
+config = loadConfig(commander.config or path.join(__dirname, 'wall.json'))
+
+if commander.database
+  config.database = commander.database
 
 app = makeApp(config).listen(commander.port or 3004)
