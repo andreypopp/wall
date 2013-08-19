@@ -82,7 +82,7 @@ HasComments =
 
   onCommentSubmit: (value) ->
     if value
-      comment = new Item(description: value, parent: this.props.model.id)
+      comment = new Item(post: value, parent: this.props.model.id)
       this.props.model.comments.add(comment)
       comment.save().then =>
         this.setState(commentEditorShown: false)
@@ -92,7 +92,7 @@ HasComments =
       `<CommentEditor autofocus onSubmit={this.onCommentSubmit} onCancel={this.onCommentCancel} />`
 
   renderComments: ->
-    if this.props.model.comments.length > 0
+    if this.props.model.comments?.length > 0
       Comments(comments: this.props.model.comments)
 
 class User extends Record
@@ -101,7 +101,7 @@ class Item extends Record
   @define
     title: null
     uri: null
-    description: null
+    post: null
     created: null
     creator: null
     parent: null
@@ -182,7 +182,7 @@ FullItemView = React.createClass
   render: ->
     item = this.props.item
     `<ItemView externalLink class="FullItemView" item={item}>
-      {item.description && <div class="description">{item.description}</div>}
+      {item.post && <div class="post">{item.post}</div>}
      </ItemView>`
 
 CommentView = React.createClass
@@ -196,7 +196,7 @@ CommentView = React.createClass
     `<div class="CommentView">
       <div class="meta">
         <i class="icon icon-comment"></i>
-        <div class="description">{item.description}</div>
+        <div class="post">{item.post}</div>
         <Timestamp class="created" relative value={item.created} />
         <div class="creator">by {username(item.creator)} / {provider(item.creator)}</div>
         <div class="Controls">
@@ -210,17 +210,17 @@ CommentView = React.createClass
 
 CommentEditor = React.createClass
   focus: ->
-    Backbone.$(this.refs.description.getDOMNode()).focus()
+    Backbone.$(this.refs.post.getDOMNode()).focus()
 
   componentDidMount: ->
     this.focus() if this.props.autofocus
 
   onSubmit: ->
-    this.props.onSubmit this.refs.description.getDOMNode().value if this.props.onSubmit?
+    this.props.onSubmit this.refs.post.getDOMNode().value if this.props.onSubmit?
 
   render: ->
     `<div class="CommentEditor">
-      <Textarea autosize ref="description" class="description" placeholder="Your comment"></Textarea>
+      <Textarea autosize ref="post" class="post" placeholder="Your comment"></Textarea>
       <div class="Controls">
         <Control onClick={this.onSubmit} icon="ok" />
         <Control onClick={this.props.onCancel} icon="remove" />
@@ -266,7 +266,7 @@ SubmitDialog = React.createClass
     data =
       title: this.refs.title.getDOMNode().value
       uri: this.refs.uri.getDOMNode().value
-      description: this.refs.description.getDOMNode().value
+      post: this.refs.post.getDOMNode().value
     this.state.model.save(data).then =>
       Wall.show(new ItemScreen(model: this.state.model), trigger: true)
       Wall.hideModal()
@@ -280,8 +280,8 @@ SubmitDialog = React.createClass
       <div class="form">
         <input type="text" class="title" ref="title" value={item.title} placeholder="Title" />
         <input type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
-        <Textarea autosize class="description" ref="description" placeholder="Description">
-          {item.description}
+        <Textarea autosize class="post" ref="post" placeholder="Description">
+          {item.post}
         </Textarea>
       </div>
       <div class="Controls">
