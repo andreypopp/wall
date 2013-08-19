@@ -28,7 +28,7 @@ install link:
 	@npm $@
 
 test specs:
-	@$(BIN)/mocha -b -R spec --compilers coffee:coffee-script ./specs.coffee
+	@$(BIN)/mocha -b -R progress --compilers coffee:coffee-script ./specs.coffee
 
 release-patch: build test
 	@$(call release,patch)
