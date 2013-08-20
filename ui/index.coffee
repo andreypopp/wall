@@ -51,7 +51,7 @@ FocusController =
 
     this.delegateDOMEvents "focus:active #{focusItems}", (e) ->
       $nodes = getFocusables()
-      $nodes.not(e.target).attr('tabindex', -1)
+      $nodes.not(e.target).attr('tabindex', -1).blur()
       $(e.target).attr('tabindex', 0)
 
 AppEvents = extend {}, Backbone.Events,
@@ -200,7 +200,7 @@ ItemView = React.createClass
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
     cls = "ItemView #{this.props.className or ''}"
-    `<div class={cls} tabIndex="1" onFocus={this.onFocus} onKeyDown={this.onKeyDown}>
+    `<div class={cls} tabIndex="1" onTouchStart={this.onFocus} onFocus={this.onFocus} onKeyDown={this.onKeyDown}>
       <div class="meta">
         {this.renderIcon()}
         {item.title && <h4 class="title"><a tabIndex="-1" href={mainLink}>{item.title}</a></h4>}
@@ -457,6 +457,7 @@ App = React.createClass
      </div>`
 
 window.onload = ->
+  React.initializeTouchEvents(true)
   Wall = window.Wall = App(title: "wall")
   Wall.settings = __data
   React.renderComponent Wall, document.body
