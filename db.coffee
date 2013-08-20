@@ -12,15 +12,6 @@ pg          = require 'pg'
 sql         = require 'sql'
 {extend}    = require 'underscore'
 
-withDB = (database) ->
-  (req, res, next) ->
-    connect(database).then (conn) ->
-      res.on 'finish', ->
-        query(conn, "ROLLBACK").fin(conn.release)
-      query(conn, "BEGIN")
-        .then(-> req.conn = conn)
-        .fin(next)
-
 connect = (uri) ->
   promise = defer()
   pg.connect uri, (err, conn, done) ->
@@ -37,6 +28,9 @@ query = (db, text, values...) ->
   db.query text, values, (err, result) ->
     if err then promise.reject(err) else promise.resolve(result)
   promise
+
+begin = (db) ->
+  query(db, "BEGIN")
 
 commit = (db) ->
   query(db, "COMMIT")
@@ -58,5 +52,5 @@ items = sql.define
     'parent', 'child_count']
 
 module.exports = extend {}, pg, {
-  items, withDB, connect,
-  query, queryRows, queryRow, commit, rollback}
+  items, connect,
+  query, queryRows, queryRow, begin, commit, rollback}

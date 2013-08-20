@@ -15,8 +15,8 @@ page                                  = require 'connect-page'
 stylus                                = require 'connect-stylus'
 browserify                            = require 'connect-browserify'
 passport                              = require 'passport'
-{commit, rollback,
-  queryRow, queryRows, withDB, items} = require './db'
+{begin, commit, rollback, connect,
+  queryRow, queryRows, items} = require './db'
 {Item}                                = require './models'
 
 rel = path.join.bind(null, __dirname)
@@ -31,12 +31,6 @@ promise = (func) ->
 
 authOnly = (req, res, next) ->
   unless req.user then res.send 401 else next()
-
-commitDB = (handler) ->
-  (req, res, next) ->
-    handler(req, res, next)
-      .then (result) ->
-        commit(req.conn).then -> result
 
 model = (modelClass) ->
   (req, res, next) ->
@@ -66,15 +60,31 @@ assets = (options = {}) ->
 
 api = (options = {}) ->
 
+  readingDB = (handler) -> (req, res, next) ->
+    connect(options.database)
+      .then (conn) ->
+        req.conn = conn
+        handler(req, res, next)
+      .fin ->
+        req.conn.release()
+
+  writingDB = (handler) ->
+    readingDB (req, res, next) ->
+      begin(req.conn).then ->
+        handler(req, res, next)
+          .then (result) ->
+            commit(req.conn).then -> result
+          .fail (err) ->
+            rollback(req.conn).then -> throw err
+
   app = express()
   app.use express.bodyParser()
-  app.use withDB(options.database)
 
-  app.get '/items', promise (req, res) ->
+  app.get '/items', promise readingDB (req, res) ->
     q = "select * from items where parent is null order by created desc"
     queryRows(req.conn, q).then (items) -> {items}
 
-  app.post '/items', authOnly, model(Item), promise commitDB (req, res) ->
+  app.post '/items', authOnly, model(Item), promise writingDB (req, res) ->
     data = req.body or {}
     data.creator = req.user.id
     q = items.insert(data).returning(items.star())
@@ -82,7 +92,7 @@ api = (options = {}) ->
       item.comments = []
       item
 
-  app.get '/items/:id', promise (req, res) ->
+  app.get '/items/:id', promise readingDB (req, res) ->
     itemQuery = "select * from items where id = $1"
     commentsQuery = """
       with recursive comments as (
