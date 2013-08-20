@@ -45,8 +45,8 @@ screen-tablet-max = screen-small-max
 screen-large = 1200px
 screen-large-desktop = screen-large
 
-tablet = "screen and (min-width: " + screen-tablet + ") and (max-width: " + screen-tablet-max + ")"
-desktop = "screen and (min-width: " + screen-desktop + ")"
+tablet = "only screen and (min-width: " + screen-tablet + ") and (max-width: " + screen-tablet-max + ")"
+desktop = "only screen and (min-width: " + screen-desktop + ")"
 
 @import url('http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,300')
 @import normalize
@@ -317,7 +317,6 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
 
 .LoginDialog
   @extend .Modalized
-  width: 400px
   height: 200px
   .caption
     text-align: center
@@ -348,7 +347,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
 @media tablet
   .App
     width: screen-tablet - 100px
-  .SubmitDialog
+  .SubmitDialog, .LoginDialog
     width: screen-tablet - 100px
   .Control
     padding: padding-vertical padding-horizontal
@@ -356,7 +355,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
 @media desktop
   .App
     width: screen-tablet - 100px
-  .SubmitDialog
+  .SubmitDialog, .LoginDialog
     width: screen-tablet - 100px
   .Control
     padding: padding-vertical padding-horizontal
