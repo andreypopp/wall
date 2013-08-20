@@ -406,7 +406,10 @@ App = React.createClass
     'auth/:provider': 'auth'
 
   events:
-    'click a': (e) ->
+    'click a': 'onClick'
+    'touchstart a': 'onClick'
+      
+  onClick: (e) ->
       href = e.currentTarget.attributes?.href?.value
       if href? and not /https?:/.exec href
         e.preventDefault()
