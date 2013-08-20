@@ -268,19 +268,22 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
       display: none
       position: absolute
       bottom: 0
-      height: padding-vertical + line-height-computed
       right: 0
   .Comments, .CommentEditor
     margin-top: padding-vertical
 
 .CommentEditor
+  HasLeftIcon(20px)
   background: color-bg-highlight
+  position: relative
+  padding-bottom: padding-vertical + line-height-computed
   textarea
-    padding: padding-vertical padding-horizontal
     background: color-bg-highlight
     border: none
   .Controls
-    text-align: right
+    position: absolute
+    bottom: 0
+    right: 0
   .Control
     background: color-bg-highlight
 

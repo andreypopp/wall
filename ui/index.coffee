@@ -253,6 +253,7 @@ CommentEditor = React.createClass
 
   render: ->
     `<div class="CommentEditor">
+      <i class="icon icon-comment"></i>
       <Textarea onKeyDown={this.onKeyDown} autosize
         ref="post" class="post" placeholder="Your comment"></Textarea>
       <div class="Controls">
