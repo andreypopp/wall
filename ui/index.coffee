@@ -63,14 +63,16 @@ LocationAware =
     this.router = new Backbone.Router(routes: this.routes)
 
 UserAware =
+  USER_KEY: 'wall.user'
+
   getUser: ->
     try
-      JSON.parse localStorage.getItem('wall.user')
+      JSON.parse localStorage.getItem(this.USER_KEY)
     catch e
       null
 
   _handleStorageEvent: (e) ->
-    this.forceUpdate() if e.key == 'wall.user'
+    this.setState(user: this.getUser()) if e.key == this.USER_KEY
 
   componentDidMount: ->
     Backbone.$(window).on "storage", this._handleStorageEvent
@@ -411,11 +413,7 @@ App = React.createClass
         this.router.navigate href, trigger: true
 
   getInitialState: ->
-    user = try
-      JSON.parse window.localStorage.getItem('wall.user')
-    catch e
-      null
-    {user}
+    {user: this.getUser()}
 
   componentDidMount: ->
     this.listenTo this.router, 'route:items', =>
