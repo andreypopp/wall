@@ -159,11 +159,12 @@ textarea
   padding: padding-vertical padding-horizontal
   background: color-bg
   user-select: none
-  &:hover
+  &:hover, &:focus
+    outline: none
     background: color-bg-highlight
     text-decoration: none
-  .label
-    margin-left: padding-small-horizontal
+  .icon
+    margin-right: padding-small-horizontal
 
 .App
   width: app-width

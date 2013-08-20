@@ -84,7 +84,7 @@ HasModal =
       `<Modal ref="modal"
         onShow={this.onModalShow}
         onHide={this.onModalHide}
-        onClick={this.hideModal}>{this.state.modal}</Modal>` 
+        onClick={this.hideModal}>{this.state.modal}</Modal>`
 
   onModalShow: ->
     this.refs.modal.focus()
@@ -128,13 +128,24 @@ HasComments =
       Comments(comments: this.props.model.comments)
 
 Control = React.createClass
+  onKeyDown: (e) ->
+    this.onClick() if e.keyCode == 13
+
+  onClick: ->
+    if this.props.onClick?
+      this.props.onClick()
+    else
+      Wall.router.navigate(this.props.href, trigger: true)
+
   render: ->
     iconClass = "icon icon-#{this.props.icon}"
     selfClass = "Control #{this.props.class or ''}"
     label = if this.props.label
       `<span class="label">{this.props.label}</span>`
-    `<a onClick={this.props.onClick} class={selfClass} href={this.props.href}>
-      <i class={iconClass}></i>{label}
+    `<a onClick={this.onClick}
+        onKeyDown={this.onKeyDown}
+        tabIndex={this.props.tabIndex || 0} class={selfClass} href={this.props.href}>
+      {this.props.icon && <i class={iconClass}></i>}{label}
      </a>`
 
 ItemsScreen = React.createClass
@@ -187,7 +198,7 @@ ItemView = React.createClass
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
     cls = "ItemView #{this.props.className or ''}"
-    `<div class={cls} tabIndex="0" onFocus={this.onFocus} onKeyDown={this.onKeyDown}>
+    `<div class={cls} tabIndex="1" onFocus={this.onFocus} onKeyDown={this.onKeyDown}>
       <div class="meta">
         {this.renderIcon()}
         {item.title && <h4 class="title"><a tabIndex="-1" href={mainLink}>{item.title}</a></h4>}
@@ -304,7 +315,7 @@ SubmitDialog = React.createClass
     Wall.hideModal()
 
   onSubmit: (e) ->
-    e.preventDefault()
+    e?.preventDefault()
     this.submit()
 
   onKeyDown: (e) ->
@@ -424,10 +435,10 @@ App = React.createClass
   renderControls: ->
     controls = if this.getUser()?
       [Control(
-        class: 'submit', icon: 'pencil', label: 'Submit',
+        class: 'submit', icon: 'pencil', label: 'Submit', tabIndex: 3,
         onClick: => this.showModal SubmitDialog()),
        Control(
-        class: 'logout', icon: 'signout',
+        class: 'logout', icon: 'signout', tabIndex: 4,
         href: '/auth/logout', label: 'Sign out')]
     else
       [Control(
@@ -439,7 +450,7 @@ App = React.createClass
     screen = this.state?.screen
     `<div class="App">
       <header>
-        <h1 class="title"><a href="/">{this.props.title}</a></h1>
+        <h1 class="title"><Control tabIndex="2" href="/" label={this.props.title} /></h1>
         {this.renderControls()}
       </header>
       <div class="screen">{screen}</div>
