@@ -131,6 +131,11 @@ ItemsScreen = React.createClass
       idx = Math.max(idx - 1, 0)
       $($nodes.get(idx)).focus()
 
+    'focus:active .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      $nodes.not(e.target).attr('tabindex', -1)
+      $(e.target).attr('tabindex', 0)
+
   render: ->
     children = if this.props.model.items.length > 0
       this.props.model.items.map (item) => ItemView {item}
@@ -166,16 +171,20 @@ ItemView = React.createClass
     if e.keyCode == 38 or e.keyCode == 75
       $node.trigger('focus:prev', $node)
 
+  onFocus: ->
+    $node = $ this.getDOMNode()
+    $node.trigger('focus:active', $node)
+
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
     cls = "ItemView #{this.props.className or ''}"
-    `<div class={cls} tabIndex="0" onKeyDown={this.onKeyDown}>
+    `<div class={cls} tabIndex="0" onFocus={this.onFocus} onKeyDown={this.onKeyDown}>
       <div class="meta">
         {this.renderIcon()}
-        {item.title && <h4 class="title"><a href={mainLink}>{item.title}</a></h4>}
+        {item.title && <h4 class="title"><a tabIndex="-1" href={mainLink}>{item.title}</a></h4>}
         {item.post && this.props.full && <div class="post">{item.post}</div>}
-        {item.uri && <a class="uri" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>}
+        {item.uri && <a class="uri" tabIndex="-1" href={item.uri}>{item.uri && url.parse(item.uri).hostname}</a>}
         <Timestamp class="created" relative value={item.created} />
         <div class="creator">by {username(item.creator)}</div>
       </div>
@@ -250,6 +259,11 @@ ItemScreen = React.createClass
       idx = $nodes.index e.target
       idx = Math.max(idx - 1, 0)
       $($nodes.get(idx)).focus()
+
+    'focus:active .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      $nodes.not(e.target).attr('tabindex', -1)
+      $(e.target).attr('tabindex', 0)
 
   renderAddCommentButton: ->
     unless this.state?.commentEditorShown
