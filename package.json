@@ -49,6 +49,7 @@
     "stylus": "~0.36.1",
     "connect-stylus": "~0.4.0",
     "normalize": "~0.3.1",
+    "connect-page": "~0.2.0",
     "nib": "~0.9.2",
     "font-awesome": "git+https://github.com/andreypopp/Font-Awesome.git",
     "react-tools": "~0.4.1",

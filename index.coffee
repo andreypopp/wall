@@ -171,6 +171,8 @@ module.exports = (options = {}) ->
     title: 'Wall'
     scripts: ['/a/js/index.js']
     stylesheets: ['/a/css/index.css']
+    meta:
+      viewport: 'width=device-width, user-scalable=no'
     data:
       authProviders: Object.keys(options.auth)
   app.use express.errorHandler()
