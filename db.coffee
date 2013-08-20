@@ -1,6 +1,6 @@
 ###
 
-  Database access layer
+  Thin database access layer based on promises.
 
   Under MIT license, see LICENSE file for details
   Andrey Popp (c) 2013

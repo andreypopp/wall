@@ -1,6 +1,6 @@
 ###
 
-  Application entry point
+  Application entry point.
 
   Under MIT license, see LICENSE file for details
   Andrey Popp (c) 2013
@@ -28,7 +28,7 @@ promise = (func) ->
       .fail(next)
       .end()
 
-authOnly = (req, res, next) ->
+authenticated = (req, res, next) ->
   unless req.user then res.send 401 else next()
 
 model = (modelClass) ->
@@ -83,7 +83,7 @@ api = (options = {}) ->
     q = "select * from items where parent is null order by created desc"
     queryRows(req.conn, q).then (items) -> {items}
 
-  app.post '/items', authOnly, model(Item), promise writingDB (req, res) ->
+  app.post '/items', authenticated, model(Item), promise writingDB (req, res) ->
     data = req.body or {}
     data.creator = req.user.id
     q = items.insert(data).returning(items.star())
