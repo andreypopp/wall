@@ -30,6 +30,30 @@ animate = (node, animation) ->
     $node.removeClass animation
   $node.addClass animation
 
+FocusController =
+
+  componentDidMount: ->
+    focusItems = this.focusItems
+
+    getFocusables = => $(focusItems, this.getDOMNode())
+
+    this.delegateDOMEvents "focus:next #{focusItems}", (e) ->
+      $nodes = getFocusables()
+      idx = $nodes.index e.target
+      idx = Math.min(idx + 1, $nodes.length - 1)
+      $($nodes.get(idx)).focus()
+
+    this.delegateDOMEvents "focus:prev #{focusItems}", (e) ->
+      $nodes = getFocusables()
+      idx = $nodes.index e.target
+      idx = Math.max(idx - 1, 0)
+      $($nodes.get(idx)).focus()
+
+    this.delegateDOMEvents "focus:active #{focusItems}", (e) ->
+      $nodes = getFocusables()
+      $nodes.not(e.target).attr('tabindex', -1)
+      $(e.target).attr('tabindex', 0)
+
 AppEvents = extend {}, Backbone.Events,
   componentWillUnmount: ->
     this.stopListening()
@@ -114,27 +138,11 @@ Control = React.createClass
      </a>`
 
 ItemsScreen = React.createClass
-  mixins: [HasScreen, DOMEvents]
+  mixins: [HasScreen, DOMEvents, FocusController]
   propTypes:
     model: React.PropTypes.instanceOf(Items).isRequired
 
-  events:
-    'focus:next .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      idx = $nodes.index e.target
-      idx = Math.min(idx + 1, $nodes.length - 1)
-      $($nodes.get(idx)).focus()
-
-    'focus:prev .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      idx = $nodes.index e.target
-      idx = Math.max(idx - 1, 0)
-      $($nodes.get(idx)).focus()
-
-    'focus:active .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      $nodes.not(e.target).attr('tabindex', -1)
-      $(e.target).attr('tabindex', 0)
+  focusItems: '.ItemView'
 
   render: ->
     children = if this.props.model.items.length > 0
@@ -243,27 +251,10 @@ CommentEditor = React.createClass
      </div>`
 
 ItemScreen = React.createClass
-  mixins: [HasScreen, HasComments, DOMEvents]
+  mixins: [HasScreen, HasComments, DOMEvents, FocusController]
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
-
-  events:
-    'focus:next .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      idx = $nodes.index e.target
-      idx = Math.min(idx + 1, $nodes.length - 1)
-      $($nodes.get(idx)).focus()
-
-    'focus:prev .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      idx = $nodes.index e.target
-      idx = Math.max(idx - 1, 0)
-      $($nodes.get(idx)).focus()
-
-    'focus:active .ItemView': (e) ->
-      $nodes = $('.ItemView', this.getDOMNode())
-      $nodes.not(e.target).attr('tabindex', -1)
-      $(e.target).attr('tabindex', 0)
+  focusItems: '.ItemView'
 
   renderAddCommentButton: ->
     unless this.state?.commentEditorShown

@@ -56,7 +56,7 @@
     "backbone": "~1.0.0",
     "underscore": "~1.5.1",
     "react-time": "~0.3.0",
-    "react-dom-events": "~0.1.0",
+    "react-dom-events": "~0.3.0",
     "react-textarea-autosize": "~0.1.0"
   }
 }
