@@ -160,7 +160,6 @@ module.exports = (options = {}) ->
   app = express()
   app.use express.logger('dev')
   app.use express.favicon()
-  app.use express.bodyParser()
   app.use express.cookieParser()
   app.use express.cookieSession(secret: options?.secret)
   app.use passport.initialize()
