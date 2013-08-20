@@ -34,7 +34,19 @@ input-height = line-height-computed + (padding-vertical * 2) + 2
 input-height-large = (ceil(font-size-large * line-height) + (padding-large-vertical * 2) + 2)
 input-height-small = (ceil(font-size-small * line-height) + (padding-small-vertical * 2) + 2)
 
-app-width = 600px
+screen-tiny = 480px
+screen-phone = screen-tiny
+screen-small = 768px
+screen-tablet = screen-small
+screen-medium = 992px
+screen-desktop = screen-medium
+screen-small-max = (screen-medium - 1)
+screen-tablet-max = screen-small-max
+screen-large = 1200px
+screen-large-desktop = screen-large
+
+tablet = "screen and (min-width: " + screen-tablet + ") and (max-width: " + screen-tablet-max + ")"
+desktop = "screen and (min-width: " + screen-desktop + ")"
 
 @import url('http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,300')
 @import normalize
@@ -167,7 +179,6 @@ textarea
     margin-right: padding-small-horizontal
 
 .App
-  width: app-width
   margin: 0 auto
   header
     position: relative
@@ -192,7 +203,6 @@ textarea
 
 .SubmitDialog
   @extend .Modalized
-  width: app-width - 50px
   textarea
     height: 7em
   .form
@@ -333,3 +343,15 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     transform: translateX(5px)
   0%, 100%
     transform: translateX(0)
+
+@media tablet
+  .App
+    width: screen-tablet - 100px
+  .SubmitDialog
+    width: screen-tablet - 100px
+
+@media desktop
+  .App
+    width: screen-tablet - 100px
+  .SubmitDialog
+    width: screen-tablet - 100px
