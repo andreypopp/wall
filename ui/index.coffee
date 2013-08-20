@@ -213,7 +213,7 @@ ItemView = React.createClass
      </div>`
 
 CommentView = React.createClass
-  mixins: [HasComments, HasScreen]
+  mixins: [UserAware, HasComments, HasScreen]
 
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
@@ -224,7 +224,7 @@ CommentView = React.createClass
       <div class="meta">
         <ItemView full item={this.props.model} />
         <div class="Controls">
-          <Control onClick={this.onAddComment} icon="reply" />
+          {this.getUser() && <Control onClick={this.onAddComment} icon="reply" />}
           <Control href={this.url()} icon="link" />
         </div>
       </div>
@@ -265,13 +265,13 @@ CommentEditor = React.createClass
      </div>`
 
 ItemScreen = React.createClass
-  mixins: [HasScreen, HasComments, DOMEvents, FocusController]
+  mixins: [UserAware, HasScreen, HasComments, DOMEvents, FocusController]
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
   focusItems: '.ItemView'
 
   renderAddCommentButton: ->
-    unless this.state?.commentEditorShown
+    if not this.state?.commentEditorShown and this.getUser()
       `<div class="Controls">
         <Control onClick={this.onAddComment} icon="comment" label="Discuss" />
        </div>`
