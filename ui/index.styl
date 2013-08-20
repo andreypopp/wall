@@ -168,7 +168,7 @@ textarea
   display: inline-block
   cursor: pointer
   font-weight: bold
-  padding: padding-vertical padding-horizontal
+  padding: padding-large-vertical padding-large-horizontal
   background: color-bg
   user-select: none
   &:hover, &:focus
@@ -181,12 +181,12 @@ textarea
 .App
   margin: 0 auto
   header
-    position: relative
-    margin-bottom: padding-vertical * 5
     .Controls
       position: absolute
       right: 0
       bottom: 0
+    position: relative
+    margin-bottom: padding-vertical * 5
     .title
       font-size: 150%
 
@@ -267,6 +267,7 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
 .CommentView
   & > .meta
     position: relative
+
     &:hover
       background: color-bg-highlight
       .Control
@@ -349,9 +350,13 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
     width: screen-tablet - 100px
   .SubmitDialog
     width: screen-tablet - 100px
+  .Control
+    padding: padding-vertical padding-horizontal
 
 @media desktop
   .App
     width: screen-tablet - 100px
   .SubmitDialog
     width: screen-tablet - 100px
+  .Control
+    padding: padding-vertical padding-horizontal
