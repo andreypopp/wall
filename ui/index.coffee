@@ -114,9 +114,23 @@ Control = React.createClass
      </a>`
 
 ItemsScreen = React.createClass
-  mixins: [HasScreen]
+  mixins: [HasScreen, DOMEvents]
   propTypes:
     model: React.PropTypes.instanceOf(Items).isRequired
+
+  events:
+    'focus:next .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      idx = $nodes.index e.target
+      idx = Math.min(idx + 1, $nodes.length - 1)
+      $($nodes.get(idx)).focus()
+
+    'focus:prev .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      idx = $nodes.index e.target
+      idx = Math.max(idx - 1, 0)
+      $($nodes.get(idx)).focus()
+
   render: ->
     children = if this.props.model.items.length > 0
       this.props.model.items.map (item) => ItemView {item}
@@ -143,11 +157,20 @@ ItemView = React.createClass
     else
       `<i class="icon icon-comment"></i>`
 
+  onKeyDown: (e) ->
+    $node = $ this.getDOMNode()
+    if e.keyCode == 13
+      Wall.router.navigate(this.props.item.screenURL(), trigger: true)
+    if e.keyCode == 40 or e.keyCode == 74
+      $node.trigger('focus:next', $node)
+    if e.keyCode == 38 or e.keyCode == 75
+      $node.trigger('focus:prev', $node)
+
   render: ->
     item = this.props.item
     mainLink = if this.props.externalLink then item.uri else item.screenURL()
     cls = "ItemView #{this.props.className or ''}"
-    `<div class={cls}>
+    `<div class={cls} tabIndex="0" onKeyDown={this.onKeyDown}>
       <div class="meta">
         {this.renderIcon()}
         {item.title && <h4 class="title"><a href={mainLink}>{item.title}</a></h4>}
@@ -211,9 +234,22 @@ CommentEditor = React.createClass
      </div>`
 
 ItemScreen = React.createClass
-  mixins: [HasScreen, HasComments]
+  mixins: [HasScreen, HasComments, DOMEvents]
   propTypes:
     model: React.PropTypes.instanceOf(Item).isRequired
+
+  events:
+    'focus:next .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      idx = $nodes.index e.target
+      idx = Math.min(idx + 1, $nodes.length - 1)
+      $($nodes.get(idx)).focus()
+
+    'focus:prev .ItemView': (e) ->
+      $nodes = $('.ItemView', this.getDOMNode())
+      idx = $nodes.index e.target
+      idx = Math.max(idx - 1, 0)
+      $($nodes.get(idx)).focus()
 
   renderAddCommentButton: ->
     unless this.state?.commentEditorShown
