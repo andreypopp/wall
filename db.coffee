@@ -29,6 +29,12 @@ query = (db, text, values...) ->
     if err then promise.reject(err) else promise.resolve(result)
   promise
 
+queryRows = (args...) ->
+  query(args...).then (res) -> res.rows
+
+queryRow = (args...) ->
+  query(args...).then (res) -> res.rows[0]
+
 begin = (db) ->
   query(db, "BEGIN")
 
@@ -38,12 +44,6 @@ commit = (db) ->
 rollback = (db) ->
   query(db, "ROLLBACK")
 
-queryRows = (args...) ->
-  query(args...).then (res) -> res.rows
-
-queryRow = (args...) ->
-  query(args...).then (res) -> res.rows[0]
-
 items = sql.define
   name: 'items'
   columns: [
@@ -52,5 +52,5 @@ items = sql.define
     'parent', 'child_count']
 
 module.exports = extend {}, pg, {
-  items, connect,
-  query, queryRows, queryRow, begin, commit, rollback}
+  items, connect, begin, commit, rollback,
+  query, queryRows, queryRow}

@@ -9,7 +9,6 @@
 
 path                                  = require 'path'
 {extend}                              = require 'underscore'
-{all}                                 = require 'kew'
 express                               = require 'express'
 page                                  = require 'connect-page'
 stylus                                = require 'connect-stylus'
@@ -93,30 +92,22 @@ api = (options = {}) ->
       item
 
   app.get '/items/:id', promise readingDB (req, res) ->
-    itemQuery = "select * from items where id = $1"
-    commentsQuery = """
+    q = """
       with recursive comments as (
-        select items.* from items where parent = $1
+        select items.* from items where id = $1
           union
         select items.* from items join comments on comments.id = items.parent)
       select * from comments
     """
-
-    deserializeTree = (root, items) ->
+    queryRows(req.conn, q, req.params.id).then (items) ->
+      rootId = items[0].id
       mapping = {}
-      mapping[root.id] = root
-      root.comments = []
       for item in items
-        item.comments = []
         mapping[item.id] = item
+        item.comments = []
         parent = mapping[item.parent]
         parent.comments.push(item) if parent
-
-    item = queryRow(req.conn, itemQuery, req.params.id)
-    comments = queryRows(req.conn, commentsQuery, req.params.id)
-    all(item, comments).then ([item, comments]) ->
-      deserializeTree item, comments
-      item
+      mapping[rootId]
 
   app
 
