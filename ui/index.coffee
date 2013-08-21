@@ -425,12 +425,12 @@ App = React.createClass
   events:
     'click a': 'onClick'
     'touchstart a': 'onClick'
-      
+
   onClick: (e) ->
-      href = e.currentTarget.attributes?.href?.value
-      if href? and not /https?:/.exec href
-        e.preventDefault()
-        this.router.navigate href, trigger: true
+    href = e.currentTarget.attributes?.href?.value
+    if href? and not /https?:/.exec href
+      e.preventDefault()
+      this.router.navigate href, trigger: true
 
   getInitialState: ->
     {user: this.getUser()}
@@ -447,6 +447,7 @@ App = React.createClass
       Backbone.history.history.back()
 
   show: (screen, options = {}) ->
+    window.scrollTo(0)
     this.setState {screen}
     screenURL = screen.url()
     this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
