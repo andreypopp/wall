@@ -38,8 +38,9 @@ queryRow = (args...) ->
 queryScalar = (args...) ->
   query(args...).then (res) ->
     row = res.rows[0]
-    columnName = Object.keys(row)[0]
-    row[columnName]
+    if row
+      columnName = Object.keys(row)[0]
+      row[columnName] 
 
 begin = (db) ->
   query(db, "BEGIN")

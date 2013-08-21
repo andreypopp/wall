@@ -113,8 +113,8 @@ api = (options = {}) ->
         q = q.where(items_ordered.order.gte(order))
 
       queryRows(req.conn, q).then (items) ->
-        nextId = items[limit].id if items.length == limit + 1
-        prevId = null if items[0].id == prevId
+        nextId = items[limit]?.id if items.length == limit + 1
+        prevId = null if items[0]?.id == prevId
 
         items = items.slice(0, limit)
         {items, nextId, prevId, limit: req.query.limit, after: req.query.after}
