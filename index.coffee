@@ -204,12 +204,13 @@ module.exports = (options = {}) ->
   app.use '/api', api(options)
   app.use '/a', assets(options)
   app.use page
-    title: 'Wall'
+    title: options.title or 'wall'
     scripts: ['/a/js/index.js']
     stylesheets: ['/a/css/index.css']
     meta:
       viewport: 'width=device-width, user-scalable=no'
     data:
+      title: options.title or 'wall'
       authProviders: Object.keys(options.auth)
   app.use express.errorHandler()
   app

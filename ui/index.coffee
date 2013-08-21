@@ -504,7 +504,7 @@ App = React.createClass
 
 window.onload = ->
   React.initializeTouchEvents(true)
-  Wall = window.Wall = App(title: "wall")
+  Wall = window.Wall = App(title: __data.title or 'wall')
   Wall.settings = __data
   React.renderComponent Wall, document.body
   Backbone.history.start(pushState: true)
