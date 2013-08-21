@@ -74,7 +74,7 @@ UserAware =
       null
 
   _handleStorageEvent: (e) ->
-    this.setState(user: this.getUser()) if e.key == this.USER_KEY
+    this.setState(user: this.getUser()) if e.originalEvent.key == this.USER_KEY
 
   componentDidMount: ->
     Backbone.$(window).on "storage", this._handleStorageEvent

@@ -19,15 +19,15 @@ zindex-modal = 10000
   &.fade .modal-dialog
     transform-origin: top center
     transform-style: preserve-3d
-    transform: translate(0, -10%) rotateX(-45deg)
+    transform: translate(0, -10%)
     opacity: 0
     transition-property: transform, opacity
-    transition-duration: 0.25s
+    transition-duration: 0.20s
     transition-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000)
 
   &.fade.in  .modal-dialog
     opacity: 1
-    transform: translate(0, 0) rotateX(0deg)
+    transform: translate(0, 0)
 
 .modal-dialog
   margin-left: auto
