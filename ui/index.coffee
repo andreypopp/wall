@@ -197,7 +197,7 @@ Pagination = React.createClass
         iconRight: true
         icon: 'arrow-right'
         href: "/?#{qs.stringify(after: nextId)}"
-    `<div class="Pagination">{prev}{next}</div>`
+    `<div class="Pagination Controls">{prev}{next}</div>`
 
 ItemsScreen = React.createClass
   mixins: [HasScreen, DOMEvents, FocusController]
@@ -462,10 +462,10 @@ App = React.createClass
   componentDidMount: ->
     this.listenTo this.router, 'route:items', (params) =>
       model = new Items(params)
-      model.fetch().then => this.show new ItemsScreen {model}
+      model.fetch().then => this.show new ItemsScreen({model}), suppressNavigation: true
     this.listenTo this.router, 'route:item', (id) =>
       model = new Item {id}
-      model.fetch().then => this.show new ItemScreen {model}
+      model.fetch().then => this.show new ItemScreen({model}), suppressNavigation: true
     this.listenTo this.router, 'route:auth', (provider) =>
       window.open(window.location.pathname)
       Backbone.history.history.back()
@@ -474,7 +474,8 @@ App = React.createClass
     window.scrollTo(0)
     this.setState {screen}
     screenURL = screen.url()
-    this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
+    unless options.suppressNavigation
+      this.router.navigate screenURL, {trigger: options.trigger} if screenURL?
 
   renderControls: ->
     controls = if this.getUser()?

@@ -359,18 +359,19 @@ HasLeftIcon(icon-size, color-icon = color-mute, top = 0)
   0%, 100%
     transform: translateX(0)
 
-@media tablet
+desktop-or-tablet()
   .App
     width: screen-tablet - 100px
   .SubmitDialog
     width: screen-tablet - 100px
   .Control
     padding: padding-vertical padding-horizontal
+  .Pagination
+    text-align: center
+    .Control
+      float: none
 
 @media desktop
-  .App
-    width: screen-tablet - 100px
-  .SubmitDialog
-    width: screen-tablet - 100px
-  .Control
-    padding: padding-vertical padding-horizontal
+  desktop-or-tablet()
+@media tablet
+  desktop-or-tablet()

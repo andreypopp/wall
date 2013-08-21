@@ -18,7 +18,7 @@ browserify                            = require 'connect-browserify'
 passport                              = require 'passport'
 {begin, commit, rollback, connect,
   queryScalar, queryRow, queryRows,
-  items_ordered}                      = require './db'
+  items_ordered, items}               = require './db'
 {Item}                                = require './models'
 
 rel = path.join.bind(null, __dirname)
