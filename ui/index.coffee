@@ -144,11 +144,39 @@ Control = React.createClass
     selfClass = "Control #{this.props.class or ''}"
     label = if this.props.label
       `<span class="label">{this.props.label}</span>`
-    `<a onClick={this.onClick}
-        onKeyDown={this.onKeyDown}
+    `<a onClick={this.onClick} onKeyDown={this.onKeyDown}
         tabIndex={this.props.tabIndex || 0} class={selfClass} href={this.props.href}>
       {this.props.icon && <i class={iconClass}></i>}{label}
      </a>`
+
+Dropdown = React.createClass
+
+  toggle: ->
+    if this.isShown() then this.hide() else this.show()
+
+  show: ->
+    this.getDOMNode().classList.add('shown')
+
+  hide: (e) ->
+    this.getDOMNode().classList.remove('shown')
+
+  isShown: ->
+    this.getDOMNode().classList.contains('shown')
+
+  onBlur: ->
+    # so click event can fire
+    setTimeout(this.hide, 50)
+
+  render: ->
+    selfClass = "Dropdown #{this.props.className or ''}"
+    `<div onBlur={this.onBlur} class={selfClass}>
+      <Control tabIndex={this.props.tabIndex}
+        onClick={this.toggle} icon={this.props.icon}
+        href={this.props.href} label={this.props.label} />
+      <div ref="menu" role="menu" class="menu">
+        {this.props.children}
+      </div>
+     </div>`
 
 ItemsScreen = React.createClass
   mixins: [HasScreen, DOMEvents, FocusController]
@@ -382,17 +410,6 @@ Modal = React.createClass
       </div>
      </div>`
 
-LoginDialog = React.createClass
-  render: ->
-    buttons = for provider in Wall.settings.authProviders
-      Control(icon: provider, href: "/auth/#{provider}", label: "Sign in with #{provider}")
-    `<div class="LoginDialog">
-      <div class="caption">
-        Sign in with one of the authentication providers below
-      </div>
-      <div onClick={Wall.hideModal} class="Controls">{buttons}</div>
-     </div>`
-
 App = React.createClass
   mixins: [AppEvents, DOMEvents, LocationAware, UserAware, HasModal]
 
@@ -443,9 +460,9 @@ App = React.createClass
         class: 'logout', icon: 'signout', tabIndex: 4,
         href: '/auth/logout', label: 'Sign out')]
     else
-      [Control(
-        class: 'login', icon: 'signin', label: 'Sign in',
-        onClick: => this.showModal LoginDialog())]
+      `<Dropdown class="login" icon="signin" label="Sign in">
+        <Control href="/auth/facebook" label="with Facebook" icon="facebook" />
+       </Dropdown>`
     `<div class="Controls">{controls}</div>`
 
   render: ->
