@@ -35,6 +35,12 @@ queryRows = (args...) ->
 queryRow = (args...) ->
   query(args...).then (res) -> res.rows[0]
 
+queryScalar = (args...) ->
+  query(args...).then (res) ->
+    row = res.rows[0]
+    columnName = Object.keys(row)[0]
+    row[columnName]
+
 begin = (db) ->
   query(db, "BEGIN")
 
@@ -51,6 +57,14 @@ items = sql.define
     'created', 'updated', 'creator',
     'parent', 'child_count']
 
+items_ordered = sql.define
+  name: 'items_ordered'
+  columns: [
+    'id', 'title', 'uri', 'post',
+    'created', 'updated', 'creator',
+    'parent', 'child_count', 'order']
+
 module.exports = extend {}, pg, {
-  items, connect, begin, commit, rollback,
-  query, queryRows, queryRow}
+  items, items_ordered,
+  connect, begin, commit, rollback,
+  query, queryRows, queryRow, queryScalar}

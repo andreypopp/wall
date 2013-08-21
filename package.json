@@ -52,6 +52,7 @@
     "connect-page": "~0.2.0",
     "nib": "~0.9.2",
     "font-awesome": "git+https://github.com/andreypopp/Font-Awesome.git",
+    "backbone-query-parameters": "git+https://github.com/jhudson8/backbone-query-parameters.git",
     "react-tools": "~0.4.1",
     "backbone.record": "~1.0.0",
     "backbone": "~1.0.0",

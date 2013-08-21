@@ -18,4 +18,12 @@ begin;
   create index on items (updated desc);
   create index on items (parent);
 
+  -- top level items ordered by created desc
+  create view items_ordered as
+    select items.id,
+      items.*,
+      row_number() over (order by items.created desc) as "order"
+    from items
+    where items.parent is null
+    order by items.created desc;
 commit;

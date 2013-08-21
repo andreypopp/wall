@@ -7,15 +7,18 @@
 
 ###
 
+{max, min}                            = Math
 path                                  = require 'path'
 {extend}                              = require 'underscore'
+{all, resolve}                        = require 'kew'
 express                               = require 'express'
 page                                  = require 'connect-page'
 stylus                                = require 'connect-stylus'
 browserify                            = require 'connect-browserify'
 passport                              = require 'passport'
 {begin, commit, rollback, connect,
-  queryRow, queryRows, items} = require './db'
+  queryScalar, queryRow, queryRows,
+  items_ordered}                      = require './db'
 {Item}                                = require './models'
 
 rel = path.join.bind(null, __dirname)
@@ -76,12 +79,45 @@ api = (options = {}) ->
           .fail (err) ->
             rollback(req.conn).then -> throw err
 
+  orderById = (conn, id) ->
+    q = items_ordered
+      .select(items_ordered.order)
+      .where(items_ordered.id.equal(id))
+    queryScalar(conn, q)
+
+  idByOrder = (conn, order) ->
+    q = items_ordered
+      .select(items_ordered.id)
+      .where(items_ordered.order.equal(order))
+    queryScalar(conn, q)
+
   app = express()
   app.use express.bodyParser()
 
   app.get '/items', promise readingDB (req, res) ->
-    q = "select * from items where parent is null order by created desc"
-    queryRows(req.conn, q).then (items) -> {items}
+    limit = min(req.query.limit or 2, 100)
+    after = req.query.after or undefined
+
+    order = if after? then orderById(req.conn, after) else resolve(1)
+
+    prevId = order.then (order) ->
+      idByOrder req.conn, max(1, order - limit)
+
+    all([order, prevId]).then ([order, prevId]) ->
+      q = items_ordered.select()
+        .where(items_ordered.parent.isNull())
+        .order(items_ordered.created.desc)
+        .limit(limit + 1)
+
+      if order != 1
+        q = q.where(items_ordered.order.gte(order))
+
+      queryRows(req.conn, q).then (items) ->
+        nextId = items[limit].id if items.length == limit + 1
+        prevId = null if items[0].id == prevId
+
+        items = items.slice(0, limit)
+        {items, nextId, prevId, limit: req.query.limit, after: req.query.after}
 
   app.post '/items', authenticated, model(Item), promise writingDB (req, res) ->
     data = req.body or {}

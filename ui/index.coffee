@@ -9,9 +9,11 @@
 
 ###
 
+qs                            = require 'querystring'
 url                           = require 'url'
 {extend, result, isArray}     = require 'underscore'
 Backbone                      = require 'backbone'
+BackboneQueryParameters       = require 'backbone-query-parameters'
 Record                        = require 'backbone.record'
 Backbone.$                    = require 'jqueryify'
 React                         = require 'react-tools/build/modules/react'
@@ -142,11 +144,12 @@ Control = React.createClass
   render: ->
     iconClass = "icon icon-#{this.props.icon}"
     selfClass = "Control #{this.props.class or ''}"
-    label = if this.props.label
-      `<span class="label">{this.props.label}</span>`
+    tabIndex = this.props.tabIndex or 0
+    label = `<span class="label">{this.props.label}</span>` if this.props.label
+    icon = `<i class={iconClass}></i>` if this.props.icon
     `<a onClick={this.onClick} onKeyDown={this.onKeyDown}
-        tabIndex={this.props.tabIndex || 0} class={selfClass} href={this.props.href}>
-      {this.props.icon && <i class={iconClass}></i>}{label}
+        tabIndex={tabIndex} class={selfClass} href={this.props.href}>
+          {this.props.iconRight ? [label, icon] : [icon, label]}
      </a>`
 
 Dropdown = React.createClass
@@ -178,6 +181,24 @@ Dropdown = React.createClass
       </div>
      </div>`
 
+Pagination = React.createClass
+  render: ->
+    {prevId, nextId} = this.props.model
+    prev = if prevId
+      Control
+        class: 'prev'
+        label: 'Newer'
+        icon: 'arrow-left'
+        href: "/?#{qs.stringify(after: prevId)}"
+    next = if nextId
+      Control
+        class: 'next'
+        label: 'Older'
+        iconRight: true
+        icon: 'arrow-right'
+        href: "/?#{qs.stringify(after: nextId)}"
+    `<div class="Pagination">{prev}{next}</div>`
+
 ItemsScreen = React.createClass
   mixins: [HasScreen, DOMEvents, FocusController]
   propTypes:
@@ -195,7 +216,10 @@ ItemsScreen = React.createClass
           <div class="text">found something?</div>
         </div>
        </div>`
-    `<div class="ItemsScreen">{children}</div>`
+    `<div class="ItemsScreen">
+      <div class="items">{children}</div>
+      <Pagination model={this.props.model} />
+     </div>`
 
 ItemView = React.createClass
   propTypes:
@@ -436,8 +460,8 @@ App = React.createClass
     {user: this.getUser()}
 
   componentDidMount: ->
-    this.listenTo this.router, 'route:items', =>
-      model = new Items()
+    this.listenTo this.router, 'route:items', (params) =>
+      model = new Items(params)
       model.fetch().then => this.show new ItemsScreen {model}
     this.listenTo this.router, 'route:item', (id) =>
       model = new Item {id}
