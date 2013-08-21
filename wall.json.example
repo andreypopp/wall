@@ -1,0 +1,14 @@
+# JSON DISALLOWS COMMENTS, REMOVE ALL LINES WHICH STARTS WITH #
+{
+  "title": "wall",
+  # Some random string used as cookie salt
+  "secret": null,
+  "database": "postgres://localhost/wall",
+  "auth": {
+    "facebook": {
+      "clientID": null,
+      "clientSecret": null,
+      "callbackURL": "http://localhost:3004/auth/facebook/callback"
+    }
+  }
+}
