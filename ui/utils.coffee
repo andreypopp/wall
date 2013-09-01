@@ -22,10 +22,10 @@ UserAware =
     this.setState(user: this.getUser()) if e.originalEvent.key == this.USER_KEY
 
   componentDidMount: ->
-    Backbone.$(window).on "storage", this._handleStorageEvent
+    window.addEventListener "storage", this._handleStorageEvent
 
   componentWillUnmount: ->
-    Backbone.$(window).off "storage", this._handleStorageEvent
+    window.removeEventListener "storage", this._handleStorageEvent
 
 HasScreen =
   url: -> result this.props.model, 'screenURL'

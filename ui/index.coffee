@@ -78,9 +78,8 @@ App = React.createClass
         class: 'logout', icon: 'signout', tabIndex: 4,
         href: '/auth/logout', label: 'Sign out')]
     else
-      `<Dropdown class="login" icon="signin" label="Sign in">
-        <Control href="/auth/facebook" label="with Facebook" icon="facebook" />
-       </Dropdown>`
+      Dropdown({class: 'login', icon: 'signin', label: 'Sign in'},
+        Control(href: '/auth/facebook', label: 'with Facebook', icon: 'facebook'))
     `<div class="Controls">{controls}</div>`
 
   render: ->
