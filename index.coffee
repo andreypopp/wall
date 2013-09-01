@@ -16,6 +16,7 @@ page                                  = require 'connect-page'
 stylus                                = require 'connect-stylus'
 browserify                            = require 'connect-browserify'
 passport                              = require 'passport'
+reactApp                              = require 'react-app'
 {begin, commit, rollback, connect,
   queryScalar, queryRow, queryRows,
   items_ordered, items}               = require './db'
@@ -55,7 +56,7 @@ assets = (options = {}) ->
   app.get '/js/index.js', browserify
     entry: rel 'ui/index.coffee'
     extensions: ['.coffee']
-    transforms: ['coffeeify', 'reactify']
+    transforms: ['coffeeify', 'reactify/undoubted']
     debug: true
   app.use '/font', express.static rel('node_modules/font-awesome/font')
   app

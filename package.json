@@ -43,7 +43,7 @@
     "supertest": "~0.7.1",
     "coffee-script": "~1.6.3",
     "coffeeify": "~0.5.1",
-    "reactify": "~0.2.2",
+    "reactify": "0.3.x",
     "supervisor": "~0.5.3",
     "connect-browserify": "~0.6.6",
     "stylus": "~0.36.1",
@@ -57,8 +57,8 @@
     "backbone.record": "~1.0.0",
     "backbone": "~1.0.0",
     "underscore": "~1.5.1",
-    "react-time": "~0.3.0",
+    "react-time": "git+https://github.com/andreypopp/react-time.git",
     "react-dom-events": "~0.3.0",
-    "react-textarea-autosize": "~0.1.0"
+    "react-textarea-autosize": "~0.1.2"
   }
 }
