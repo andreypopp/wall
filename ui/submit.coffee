@@ -44,13 +44,13 @@ module.exports = React.createClass
 
   render: ->
     item = this.state.model
-    `<div class="SubmitDialog">
+    `<div class="SubmitDialog" onKeyDown={this.onKeyDown}>
       <div class="form">
-        <input onKeyDown={this.onKeyDown}
+        <input 
           type="text" class="uri" ref="uri" value={item.uri} placeholder="URL" />
-        <input onKeyDown={this.onKeyDown}
+        <input
           type="text" class="title" ref="title" value={item.title} placeholder="Title" />
-        <Textarea onKeyDown={this.onKeyDown}
+        <Textarea
           autosize class="post" ref="post" placeholder="Description">
           {item.post}
         </Textarea>
